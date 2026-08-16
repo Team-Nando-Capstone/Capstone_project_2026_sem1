@@ -1,0 +1,13 @@
+.venv/
+venv/
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# Keep the dataset private until redistribution permission is confirmed.
+data/
+synthentic_data_5_min_LV/
+
+# Generated model files and training artifacts.
+results/
+*.pt
