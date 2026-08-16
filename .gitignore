@@ -4,9 +4,8 @@ __pycache__/
 .ipynb_checkpoints/
 *.pyc
 
-# Keep the dataset private until redistribution permission is confirmed.
+# Keep alternate local data folders private.
 data/
-synthentic_data_5_min_LV/
 
 # Generated model files and training artifacts.
 results/
