@@ -1,0 +1,4 @@
+component,variance share [%],std [V],interpretation
+feeder-wide  c(t),97.85145,0.5420003,one measurement could capture this
+per-phase    p(t),2.14827,0.08030828,needs one measurement per phase
+per-customer r(t),0.00028026674,0.0009172795,would need a meter at every customer

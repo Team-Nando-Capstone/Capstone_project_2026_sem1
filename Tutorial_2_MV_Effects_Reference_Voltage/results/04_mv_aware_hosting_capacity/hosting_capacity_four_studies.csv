@@ -1,0 +1,5 @@
+study,hosting capacity [kW/customer],total feeder PV [kW],limiting customer,error vs ground truth [%]
+A. LV assumption,4.118,115.3,C25,-14.9
+B. Ground truth (measured MV),4.841,135.5,C31,0.0
+C. P/Q-only model,5.693,159.4,C31,17.6
+D. Vref model,4.866,136.2,C25,0.5

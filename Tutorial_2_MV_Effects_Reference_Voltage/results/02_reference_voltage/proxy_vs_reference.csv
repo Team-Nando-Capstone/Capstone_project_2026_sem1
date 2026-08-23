@@ -1,0 +1,5 @@
+model,extra inputs,new hardware,test RMSE [V],fraction of the gap closed [%]
+A: P|Q only (Notebook 1's failure),0,none,0.6183332204818726,0.0
+D: + 2 clock harmonics + demand aggregates,10,none,0.4774712324142456,22.82
+E: + a coefficient per 5-minute slot,288,none,0.0015123207122087479,99.91
+B: + 3 reference voltages,3,3 voltage monitors,0.0009371336200274527,100.0
