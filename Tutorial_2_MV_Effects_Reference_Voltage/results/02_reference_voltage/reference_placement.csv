@@ -1,0 +1,4 @@
+position,reference customers,mean hops from transformer,test RMSE [V]
+head,"C1, C2, C3",2.0,0.000937
+mid,"C16, C17, C18",13.0,0.000486
+end,"C26, C30, C31",18.7,0.000617
