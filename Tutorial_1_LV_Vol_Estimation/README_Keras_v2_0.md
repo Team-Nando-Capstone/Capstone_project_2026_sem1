@@ -11,7 +11,6 @@ Train a neural network to estimate 31 customer voltages from 62 P/Q inputs. You 
 - [Student notebook](Tutorial_1_LV_Voltage_Estimation_Keras_v2_0.ipynb)
 - [Colab data ZIP](Tutorial_1_Keras_v2_0_colab_data.zip)
 - [Local dependencies](requirements_keras.txt)
-- [English exercise answers (PDF)](Tutorial_1_Keras_v2_0_Exercise_Solutions_EN.pdf)
 - [Saved quick-mode results](results/quick/)
 
 ## Run locally
