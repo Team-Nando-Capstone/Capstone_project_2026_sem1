@@ -54,6 +54,6 @@ Save the notebook and download the files in `results/quick/` from Colab's Files 
 
 ## Exercises and results
 
-Each notebook contains two exercise groups with seven practical coding tasks. Tutorial 1 also has a separate [English answer PDF](Tutorial_1_LV_Vol_Estimation/Tutorial_1_Keras_v2_0_Exercise_Solutions_EN.pdf).
+Each notebook contains two exercise groups with seven practical coding tasks.
 
 Saved outputs were checked in local quick-mode runs. Live Colab training and full-mode runs have not been verified for this version. Numerical results can vary slightly between environments; see each tutorial guide for details.
