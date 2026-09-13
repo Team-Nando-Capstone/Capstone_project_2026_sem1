@@ -7,6 +7,13 @@ __pycache__/
 # Keep alternate local data folders private.
 data/
 
+# Keep the checked-in quick tutorial results, but ignore long local runs.
+**/results/full/
+
 # Generated model files and training artifacts.
-results/
 *.pt
+*.keras
+*.h5
+
+# Local scratch files.
+tmp/
