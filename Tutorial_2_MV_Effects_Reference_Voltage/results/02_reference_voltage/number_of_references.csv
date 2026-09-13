@@ -1,7 +1,0 @@
-configuration,n references,reference customers,evaluated on,test RMSE [V],reduction vs none [%]
-0 references,0,none,31,0.6185,0.0
-1 reference (phase 1 only),1,C1,30,0.082257,86.7
-"2 references (phases 1, 2)",2,"C1, C2",29,0.012443,97.99
-3 references (one per phase),3,"C1, C2, C3",28,0.000937,99.85
-6 references (two per phase),6,"C1, C2, C3, C4, C5, C6",25,0.000842,99.86
-9 references (three per phase),9,"C1, C2, C3, C4, C5, C6, C7, C8, C9",22,0.000752,99.88

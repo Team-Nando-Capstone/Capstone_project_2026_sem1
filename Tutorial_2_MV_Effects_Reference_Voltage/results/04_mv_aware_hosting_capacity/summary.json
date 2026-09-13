@@ -1,9 +1,0 @@
-{
-  "ground_truth_hosting_capacity_kW": 4.841,
-  "error_lv_assumption_pct": -14.9,
-  "error_pq_only_model_pct": 17.6,
-  "error_vref_model_pct": 0.5,
-  "daily_spread_ratio": 1.084,
-  "static_limit_kW": 4.841,
-  "median_dynamic_limit_kW": 7.959
-}

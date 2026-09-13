@@ -1,5 +1,0 @@
-candidate explanation,correlation with MV P/Q-only RMSE,variance explained [%]
-MV effect std [V],0.974,94.9
-own voltage std [V],-0.312,9.7
-own demand std [kW],-0.161,2.6
-hops,0.139,1.9
