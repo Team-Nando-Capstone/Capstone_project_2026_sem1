@@ -24,9 +24,9 @@ Run Sections 2.2-2.6 in order with `RUN_MODE = "quick"`. Both notebooks support 
 
 ## Run in Colab
 
-[![Open in Colab](#Tutorial2)](https://colab.research.google.com/drive/1HtoyBFzUATTBMBOEqwazzHkHN03kKRhL?usp=sharing)
+[![Tutorial 1 Colab launch badge: Open in Colab](Tutorial2)](https://colab.research.google.com/drive/1HtoyBFzUATTBMBOEqwazzHkHN03kKRhL?usp=sharing)
 
-[![Open in Colab](#Tutorial2)](https://colab.research.google.com/drive/1FBophjTJ5SIb_lFAx1a6_SkUJT9fc__H?usp=sharing)
+[![Tutorial 2 Colab launch badge: Open in Colab](Tutorial2)](https://colab.research.google.com/drive/1FBophjTJ5SIb_lFAx1a6_SkUJT9fc__H?usp=sharing)
 
 Upload the chosen notebook, run its runtime-preparation cell, and upload the matching Colab data ZIP when prompted. A whole-project upload is not needed. Download generated results before ending the runtime; saving a notebook does not preserve separate runtime files. Only load trusted ZIP and pickle files.
 
