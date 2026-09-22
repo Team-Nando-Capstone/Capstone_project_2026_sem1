@@ -1,0 +1,8 @@
+{
+  "source": "Tutorial_2_Exercise_Solutions.tex",
+  "source_sha256": "fead991fe294151bd73e01020214768a1bf902345303b5f51c17f88d30574914",
+  "pdf": "Tutorial_2_Exercise_Solutions.pdf",
+  "pdf_sha256": "83da00e88982863237c8c9f0dcad6a7c517923b81090d3dcf302f04c51f685d6",
+  "assets": {},
+  "command": "python scripts/build_solutions.py --tutorial 2"
+}

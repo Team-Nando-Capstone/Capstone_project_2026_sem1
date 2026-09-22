@@ -2,12 +2,33 @@
 venv/
 __pycache__/
 .ipynb_checkpoints/
-*.pyc
+*.py[cod]
+.pytest_cache/
 
-# Generated model files and training artifacts.
+# Local secrets and operating-system metadata.
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Keep alternate local data folders private.
+data/
+
+# Generated plots and models; small result CSV/JSON files are retained.
+**/results/**/*.png
 *.pt
 *.keras
 *.h5
 
-# Local scratch files.
-tmp/
+# Historical local copies are not runnable tutorial entry points.
+archive/
+
+# LaTeX build intermediates.
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.xdv

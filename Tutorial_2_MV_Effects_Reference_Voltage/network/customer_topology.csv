@@ -1,0 +1,63 @@
+customer,column_index,phase,bus,branch,hops,section,x,y,side
+1,0,1,M01,main,1,"Upstream
+C1-C10",1.0,0.0,above
+2,1,2,M02,main,2,"Upstream
+C1-C10",2.0,0.0,above
+3,2,3,M03,main,3,"Upstream
+C1-C10",3.0,0.0,above
+4,3,1,M04,main,4,"Upstream
+C1-C10",4.0,0.0,above
+5,4,2,M05,main,5,"Upstream
+C1-C10",5.0,0.0,above
+6,5,3,M06,main,6,"Upstream
+C1-C10",6.0,0.0,above
+7,6,1,M07,main,7,"Upstream
+C1-C10",7.0,0.0,above
+8,7,2,M07,main,7,"Upstream
+C1-C10",7.0,0.0,below
+9,8,3,M08,main,8,"Upstream
+C1-C10",8.0,0.0,above
+10,9,1,M08,main,8,"Upstream
+C1-C10",8.0,0.0,below
+11,10,2,M09,main,9,"Mid feeder
+C11-C18",9.0,0.0,above
+12,11,3,M09,main,9,"Mid feeder
+C11-C18",9.0,0.0,below
+13,12,1,M10,main,10,"Mid feeder
+C11-C18",10.0,0.0,above
+14,13,2,M10,main,10,"Mid feeder
+C11-C18",10.0,0.0,below
+15,14,3,M11,main,11,"Mid feeder
+C11-C18",11.0,0.0,above
+16,15,1,M12,main,12,"Mid feeder
+C11-C18",12.0,0.0,above
+17,16,2,M13,main,13,"Mid feeder
+C11-C18",13.0,0.0,above
+18,17,3,M14,main,14,"Mid feeder
+C11-C18",14.0,0.0,above
+19,18,1,M15,main,15,"Downstream
+C19-C26",15.0,0.0,above
+20,19,2,M16,main,16,"Downstream
+C19-C26",16.0,0.0,above
+21,20,3,M17,main,17,"Downstream
+C19-C26",17.0,0.0,above
+22,21,1,M17,main,17,"Downstream
+C19-C26",17.0,0.0,below
+23,22,2,M18,main,18,"Downstream
+C19-C26",18.0,0.0,above
+24,23,3,M18,main,18,"Downstream
+C19-C26",18.0,0.0,below
+25,24,1,M19,main,19,"Downstream
+C19-C26",19.0,0.0,above
+26,25,2,M19,main,19,"Downstream
+C19-C26",19.0,0.0,below
+27,26,3,S01,spur,16,"End spur
+C27-C31",15.3,-2.2,above
+28,27,1,S01,spur,16,"End spur
+C27-C31",15.3,-2.2,below
+29,28,2,S02,spur,17,"End spur
+C27-C31",16.3,-2.2,above
+30,29,3,S03,spur,18,"End spur
+C27-C31",17.3,-2.2,above
+31,30,1,S04,spur,19,"End spur
+C27-C31",18.3,-2.2,above

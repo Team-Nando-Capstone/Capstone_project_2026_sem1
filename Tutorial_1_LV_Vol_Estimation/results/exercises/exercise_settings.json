@@ -1,0 +1,15 @@
+{
+  "configuration": {
+    "hidden_neurons": 155,
+    "activation": "tanh",
+    "lr": 0.001,
+    "weight_decay": 1e-05,
+    "batch_size": 72,
+    "epochs": 40
+  },
+  "selected_seed": 1,
+  "folds": 3,
+  "training_fits": 22,
+  "completed_epochs": 40,
+  "network_parameters": 14601
+}

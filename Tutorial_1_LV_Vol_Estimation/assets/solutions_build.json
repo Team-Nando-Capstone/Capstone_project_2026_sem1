@@ -1,0 +1,10 @@
+{
+  "source": "Tutorial_1_Exercise_Solutions.tex",
+  "source_sha256": "849f242306f0b7c398bdd0be81c577ceddc4523af495f0b5247fc51855ebb052",
+  "pdf": "Tutorial_1_Exercise_Solutions.pdf",
+  "pdf_sha256": "502a4dc77b5bc970d9d50dff5f15fb3e292f7e09fd0a75626a004895ac5b2710",
+  "assets": {
+    "assets/exercise_voltage_profiles.png": "6b08cae918a7bc7d6de2664faff59d39365b9671fca7406fc126fa890614793c"
+  },
+  "command": "python scripts/build_solutions.py --tutorial 1"
+}

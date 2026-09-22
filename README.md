@@ -1,57 +1,52 @@
 # AI-Based Voltage Estimation Tutorials
 
-This repository contains **Tutorial 1: LV Voltage Estimation with Keras**. It is written for electrical engineering students in the Power specialisation; no previous neural-network experience is required.
+Two Keras tutorials for electrical engineering students in the Power specialization. Start with Tutorial 1. All supplied power and voltage data are simulated. The models estimate customer voltages at the same time step; they do not forecast future voltages.
 
-All P, Q and voltage values are **simulated data**, not real customer measurements. The model estimates customer voltages from P/Q values at the same time step; it does not forecast future voltages.
+## Tutorials
 
-The repository keeps each tutorial in its own numbered folder, so Tutorial 2 can be added later without changing the Tutorial 1 paths.
+| Tutorial | Student notebook | Colab data ZIP | Local dependencies | Exercise solutions (LaTeX) | Exercise solutions (PDF) |
+|---|---|---|---|---|---|
+| 1. LV Voltage Estimation | [Notebook](Tutorial_1_LV_Vol_Estimation/Tutorial_1_LV_Voltage_Estimation.ipynb) | [ZIP](Tutorial_1_LV_Vol_Estimation/Tutorial_1_Colab_Data.zip) | [Requirements](Tutorial_1_LV_Vol_Estimation/requirements_keras.txt) | [LaTeX](Tutorial_1_LV_Vol_Estimation/Tutorial_1_Exercise_Solutions.tex) | [PDF](Tutorial_1_LV_Vol_Estimation/Tutorial_1_Exercise_Solutions.pdf) |
+| 2. MV Effects and Reference Voltage | [Notebook](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_MV_Effects_Reference_Voltage.ipynb) | [ZIP](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_Colab_Data.zip) | [Requirements](Tutorial_2_MV_Effects_Reference_Voltage/requirements_keras.txt) | [LaTeX](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_Exercise_Solutions.tex) | [PDF](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_Exercise_Solutions.pdf) |
 
-## Run Tutorial 1 in Google Colab
+See the [Tutorial 1 guide](Tutorial_1_LV_Vol_Estimation/README.md) and [Tutorial 2 guide](Tutorial_2_MV_Effects_Reference_Voltage/README.md) for data paths, training budgets and exercise instructions.
 
-<a target="_blank" href="https://colab.research.google.com/github/Team-Nando/Capstone_project_2026_DEMO/blob/main/Tutorial_1_LV_Voltage_Estimation/Tutorial_1_LV_Voltage_Estimation.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open Tutorial 1 in Colab"></a>
+## Run locally
 
-1. Click the badge above. Colab opens the notebook directly from GitHub.
-2. Read the introduction, then choose **Runtime > Run all**.
-3. If Colab asks to restart the runtime after installing packages, restart it and choose **Runtime > Run all** again.
-4. Keep the browser tab open while the model search runs. Early stopping ends a training run when its validation loss stops improving.
-5. Before the Colab runtime ends, download the CSV files from `Tutorial_1_LV_Voltage_Estimation/results/` in the Files panel. Saving the notebook does not save separate runtime files.
-
-The setup cell clones this public repository into the Colab runtime and installs the required packages. No Google Drive mount, notebook upload or separate data upload is needed. Only load the included pickle files from a trusted copy of this repository.
-
-## Run Tutorial 1 locally
-
-Download the complete repository with GitHub's **Code > Download ZIP** option and extract it, or clone it:
-
-```shell
-git clone https://github.com/Team-Nando/Capstone_project_2026_DEMO.git
-cd Capstone_project_2026_DEMO
-```
-
-Install the dependencies and start Jupyter from the repository root:
+Install dependencies into the Python environment selected by the notebook kernel. From the project root:
 
 ```shell
 python -m pip install -r requirements.txt
-jupyter lab
+python -m jupyterlab
 ```
 
-Open [`Tutorial_1_LV_Voltage_Estimation.ipynb`](Tutorial_1_LV_Voltage_Estimation/Tutorial_1_LV_Voltage_Estimation.ipynb) and run the cells in order. The notebook also works when Jupyter is started inside the Tutorial 1 folder.
+Run Sections 2.2-2.6 in order with `RUN_MODE = "quick"`. Both notebooks support starting from the project root or their own tutorial folder. From another working directory, set `TUTORIAL_DIRECTORY` in Section 2.2.2 to a relative or absolute tutorial path. Relative `DATA_FILES` entries are resolved from that directory once; absolute entries are used directly.
 
-## Tutorial 1 files
+## Run in Colab
 
-| Item | Location |
-|---|---|
-| Notebook | [`Tutorial_1_LV_Voltage_Estimation.ipynb`](Tutorial_1_LV_Voltage_Estimation/Tutorial_1_LV_Voltage_Estimation.ipynb) |
-| Detailed guide | [`Tutorial_1_LV_Voltage_Estimation/README.md`](Tutorial_1_LV_Voltage_Estimation/README.md) |
-| Dependencies | [`Tutorial_1_LV_Voltage_Estimation/requirements.txt`](Tutorial_1_LV_Voltage_Estimation/requirements.txt) |
-| Simulated data | `Tutorial_1_LV_Voltage_Estimation/synthentic_data_5_min_LV/` |
-| Verified result tables | `Tutorial_1_LV_Voltage_Estimation/results/` |
+Upload the chosen notebook, run its runtime-preparation cell, and upload the matching Colab data ZIP when prompted. A whole-project upload is not needed. Download generated results before ending the runtime; saving a notebook does not preserve separate runtime files. Only load trusted ZIP and pickle files.
 
-The existing `synthentic` spelling in the supplied data-folder name is retained to avoid breaking the data paths.
+## Exercise solutions
 
-## Training workflow
+Each tutorial contains two exercise groups with seven coding tasks. The student TODO cells remain empty. In a fresh kernel, run Sections 2.2-2.4, then use the seven listings in the matching Exercise Solutions document. The main tutorial search does not need to be repeated first.
 
-The notebook uses three blocked folds to compare eight hyperparameter combinations, then compares ten random seeds. There are no separate quick and full modes. Every validation fit has a 300-epoch safety limit and uses early stopping with a patience of 20 epochs and a minimum validation-loss improvement of `1e-5`. The best weights are restored automatically.
+The LaTeX files are the sources of the PDFs. Install Tectonic, then run `python scripts/build_solutions.py` from the project root. The [build script](scripts/build_solutions.py) rebuilds both PDFs and updates their source/asset checksums together. If the compiler is not on PATH, pass `--compiler path/to/tectonic`. Keep each tutorial's `assets/` directory in place.
 
-The final epoch count is the median best epoch from the selected seed's three validation folds. A fresh model is then trained for that fixed number of epochs using all training rows. The separate test period is used only for the final performance check.
+Main tutorial results are in `results/tutorial/quick/`; exercise results are in `results/exercises/`, relative to each tutorial folder. These are different experiments and should not be mixed. The small CSV/JSON result files are included alongside the saved notebook outputs. Generated plot files are ignored; the published Tutorial 1 illustration is in its stable `assets/` directory.
 
-Numerical results may vary slightly across hardware and software environments.
+## Validation
+
+From the project root:
+
+```shell
+python scripts/validate_tutorials.py
+```
+
+The validator checks notebook format and syntax, execution state, local links and exact filename case, both Colab data packages, solution sources and PDFs, saved result integrity and matching exercise tables. It does not train models or download data. A PDF build record in each tutorial's `assets/` directory ties the PDF to its LaTeX source.
+
+## Data conventions
+
+- Tutorial 1 uses its own `synthentic_data_5_min_LV` dataset: 62 P/Q inputs and 31 voltage outputs.
+- Tutorial 2 uses only `synthentic_data_5_min_mv_secondary`: 62 P/Q inputs, optionally adding three supplied references, and the same 31 voltage outputs. It does not require running Tutorial 1 or loading Tutorial 1 data.
+- Preserve the supplied `synthentic` folder spelling. Fit scalers on training data only, choose settings using training folds, and keep test data for evaluation.
+- The exact physical extraction node and generation procedure of Tutorial 2's secondary-reference signals are not documented in the supplied package. Do not assume a verified mapping between those three signals and particular customer targets.
