@@ -1,59 +1,57 @@
 # AI-Based Voltage Estimation Tutorials
 
-Two Keras tutorials for electrical engineering students in the **Power specialization**. No previous neural-network experience is required; start with Tutorial 1.
+This repository contains **Tutorial 1: LV Voltage Estimation with Keras**. It is written for electrical engineering students in the Power specialisation; no previous neural-network experience is required.
 
-All P, Q and voltage values are **simulated data**, not real customer measurements. The models estimate customer voltages from inputs at the same time step; they do not forecast future voltages.
+All P, Q and voltage values are **simulated data**, not real customer measurements. The model estimates customer voltages from P/Q values at the same time step; it does not forecast future voltages.
 
-## Choose a tutorial
+The repository keeps each tutorial in its own numbered folder, so Tutorial 2 can be added later without changing the Tutorial 1 paths.
 
-| Tutorial | Notebook | Instructions | Colab data package |
-|---|---|---|---|
-| 1. Estimate LV voltages from P/Q | [Notebook](Tutorial_1_LV_Vol_Estimation/Tutorial_1_LV_Voltage_Estimation_Keras_v2_0.ipynb) | [Guide](Tutorial_1_LV_Vol_Estimation/README_Keras_v2_0.md) | [ZIP](Tutorial_1_LV_Vol_Estimation/Tutorial_1_Keras_v2_0_colab_data.zip) |
-| 2. Add reference voltages to account for upstream MV effects | [Notebook](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_MV_Effects_Reference_Voltage_Keras_v2_0.ipynb) | [Guide](Tutorial_2_MV_Effects_Reference_Voltage/README_Keras_v2_0.md) | [ZIP](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_Keras_v2_0_colab_data.zip) |
+## Run Tutorial 1 in Google Colab
 
-## Run locally
+<a target="_blank" href="https://colab.research.google.com/github/Team-Nando/Capstone_project_2026_DEMO/blob/main/Tutorial_1_LV_Voltage_Estimation/Tutorial_1_LV_Voltage_Estimation.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open Tutorial 1 in Colab"></a>
 
-Keep the two tutorial folders next to each other. Tutorial 2 reads the LV data from Tutorial 1 and the MV-scenario data from its own folder:
+1. Click the badge above. Colab opens the notebook directly from GitHub.
+2. Read the introduction, then choose **Runtime > Run all**.
+3. If Colab asks to restart the runtime after installing packages, restart it and choose **Runtime > Run all** again.
+4. Keep the browser tab open while the model search runs. Early stopping ends a training run when its validation loss stops improving.
+5. Before the Colab runtime ends, download the CSV files from `Tutorial_1_LV_Voltage_Estimation/results/` in the Files panel. Saving the notebook does not save separate runtime files.
 
-```text
-Capstone_project_2026_sem1-main/
-  Tutorial_1_LV_Vol_Estimation/
-    synthentic_data_5_min_LV/
-      training/  (PQ.pkl, V.pkl)
-      test/      (PQ.pkl, V.pkl)
-  Tutorial_2_MV_Effects_Reference_Voltage/
-    synthetic_data_5_min_MV/
-      training/  (PQ.pkl, V.pkl)
-      test/      (PQ.pkl, V.pkl)
+The setup cell clones this public repository into the Colab runtime and installs the required packages. No Google Drive mount, notebook upload or separate data upload is needed. Only load the included pickle files from a trusted copy of this repository.
+
+## Run Tutorial 1 locally
+
+Download the complete repository with GitHub's **Code > Download ZIP** option and extract it, or clone it:
+
+```shell
+git clone https://github.com/Team-Nando/Capstone_project_2026_DEMO.git
+cd Capstone_project_2026_DEMO
 ```
 
-The existing `synthentic` spelling in Tutorial 1 is intentional. Do not rename it or move the data into a new `data` folder.
-
-From the project folder, install the shared dependencies and start Jupyter:
+Install the dependencies and start Jupyter from the repository root:
 
 ```shell
 python -m pip install -r requirements.txt
 jupyter lab
 ```
 
-Open the chosen notebook and run Sections 2.2-2.6 in order. Keep `RUN_MODE = "quick"` for your first run. You do not need to unpack either Colab ZIP locally or run Tutorial 1 before running Tutorial 2.
+Open [`Tutorial_1_LV_Voltage_Estimation.ipynb`](Tutorial_1_LV_Voltage_Estimation/Tutorial_1_LV_Voltage_Estimation.ipynb) and run the cells in order. The notebook also works when Jupyter is started inside the Tutorial 1 folder.
 
-If your data are stored elsewhere, edit the individual `DATA_FILES` paths in Section 2.3.1. Keep training and test files separate.
+## Tutorial 1 files
 
-## Run in Google Colab
+| Item | Location |
+|---|---|
+| Notebook | [`Tutorial_1_LV_Voltage_Estimation.ipynb`](Tutorial_1_LV_Voltage_Estimation/Tutorial_1_LV_Voltage_Estimation.ipynb) |
+| Detailed guide | [`Tutorial_1_LV_Voltage_Estimation/README.md`](Tutorial_1_LV_Voltage_Estimation/README.md) |
+| Dependencies | [`Tutorial_1_LV_Voltage_Estimation/requirements.txt`](Tutorial_1_LV_Voltage_Estimation/requirements.txt) |
+| Simulated data | `Tutorial_1_LV_Voltage_Estimation/synthentic_data_5_min_LV/` |
+| Verified result tables | `Tutorial_1_LV_Voltage_Estimation/results/` |
 
-1. Download the chosen notebook and its matching ZIP from the table above.
-2. Open [Google Colab](https://colab.research.google.com/) and choose **File > Upload notebook** to open the `.ipynb` file.
-3. Run Section **2.2.1** from the first cell, **Prepare the runtime**. If Colab requests a restart, restart and run from that cell again.
-4. When the file-preparation cell shows an upload button, select the matching ZIP. Do not rename or unpack it yourself.
-5. Continue with Sections 2.2.2-2.6 in order, using `RUN_MODE = "quick"`.
+The existing `synthentic` spelling in the supplied data-folder name is retained to avoid breaking the data paths.
 
-Each ZIP contains everything its notebook needs. **Tutorial 2's ZIP includes both LV and MV datasets**, so Colab does not need a separate Tutorial 1 upload. No whole-project upload or Google Drive mount is required.
+## Training workflow
 
-Save the notebook and download the files in `results/quick/` from Colab's Files panel before the runtime ends. Saving the notebook does not save those runtime files. A new runtime requires another ZIP upload. Only use the supplied ZIP and pickle files from a trusted source.
+The notebook uses three blocked folds to compare eight hyperparameter combinations, then compares ten random seeds. There are no separate quick and full modes. Every validation fit has a 300-epoch safety limit and uses early stopping with a patience of 20 epochs and a minimum validation-loss improvement of `1e-5`. The best weights are restored automatically.
 
-## Exercises and results
+The final epoch count is the median best epoch from the selected seed's three validation folds. A fresh model is then trained for that fixed number of epochs using all training rows. The separate test period is used only for the final performance check.
 
-Each notebook contains two exercise groups with seven practical coding tasks.
-
-Saved outputs were checked in local quick-mode runs. Live Colab training and full-mode runs have not been verified for this version. Numerical results can vary slightly between environments; see each tutorial guide for details.
+Numerical results may vary slightly across hardware and software environments.

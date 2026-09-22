@@ -1,2 +1,2 @@
-# Shared Keras dependencies for both tutorials.
--r Tutorial_1_LV_Vol_Estimation/requirements_keras.txt
+# Repository-level dependencies for Tutorial 1.
+-r Tutorial_1_LV_Voltage_Estimation/requirements.txt

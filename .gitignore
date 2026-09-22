@@ -4,12 +4,6 @@ __pycache__/
 .ipynb_checkpoints/
 *.pyc
 
-# Keep alternate local data folders private.
-data/
-
-# Keep the checked-in quick tutorial results, but ignore long local runs.
-**/results/full/
-
 # Generated model files and training artifacts.
 *.pt
 *.keras
