@@ -25,16 +25,15 @@ Run Sections 2.2-2.6 in order. Start with `RUN_MODE = "quick"`. The working dire
 
 ## Run in Colab
 
-1. Upload `Tutorial_2_MV_Effects_Reference_Voltage.ipynb` to Google Colab.
+1. Open the GitHub notebook in Colab: [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Team-Nando-Capstone/Capstone_project_2026_sem1/blob/main/Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_MV_Effects_Reference_Voltage.ipynb)
 2. Run **Prepare the runtime** in Section 2.2.1; restart if requested, then run from that cell again.
-3. Upload `Tutorial_2_Colab_Data.zip` when prompted. Do not rename it.
-4. Continue through Sections 2.2-2.6 in order using quick mode.
+3. Continue through Sections 2.2-2.6 in order using quick mode.
 
-The ZIP contains this tutorial's six simulated-data files and network files. No Google Drive mount is required. Download `Tutorial_2/results/tutorial/quick/` (or `full/`) and any `Tutorial_2/results/exercises/` files before the runtime ends. Saving the notebook does not save these files. Only load trusted ZIP and pickle files.
+In Colab, the preparation cell clones this GitHub repository into the temporary runtime and reads this tutorial's checked-in data and network files directly, so no notebook or ZIP upload is needed. Everyone can edit and run their own Colab session without changing the GitHub original; opening the badge again starts from the GitHub version. Download `results/tutorial/quick/` (or `full/`) and any `results/exercises/` files before the runtime ends. Saving a notebook does not preserve separate runtime files.
 
 ## Data and paths
 
-Locally, `synthentic_data_5_min_mv_secondary/training_tx/` and `test_tx/` each contain `PQ.pkl`, `V.pkl` and `V_secondary.pkl`. In Colab, the same dataset folder is under `data/`. Preserve the supplied folder spelling. Keep `network/customer_topology.csv` and the network image in `network/`.
+`synthentic_data_5_min_mv_secondary/training_tx/` and `test_tx/` each contain `PQ.pkl`, `V.pkl` and `V_secondary.pkl`. Preserve the supplied folder spelling. Keep `network/customer_topology.csv` and the network image in `network/`.
 
 The two input sets contain 62 and 65 columns and share all 31 voltage targets. The extra columns are `phase_a`, `phase_b` and `phase_c` from the supplied secondary-reference file, not the first three customer-voltage columns. Their exact physical extraction node and generation procedure are undocumented. Do not assume a verified reference-to-customer mapping. These signals must be available at prediction time.
 

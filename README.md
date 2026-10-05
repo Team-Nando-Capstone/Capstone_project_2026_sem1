@@ -4,10 +4,10 @@ Two Keras tutorials for electrical engineering students in the Power specializat
 
 ## Tutorials
 
-| Tutorial | Student notebook | Colab data ZIP | Local dependencies | Exercise solutions (LaTeX) | Exercise solutions (PDF) |
+| Tutorial | Student notebook | Open in Colab | Local dependencies | Exercise solutions (LaTeX) | Exercise solutions (PDF) |
 |---|---|---|---|---|---|
-| 1. LV Voltage Estimation | [Notebook](Tutorial_1_LV_Vol_Estimation/Tutorial_1_LV_Voltage_Estimation.ipynb) | [ZIP](Tutorial_1_LV_Vol_Estimation/Tutorial_1_Colab_Data.zip) | [Requirements](Tutorial_1_LV_Vol_Estimation/requirements_keras.txt) | [LaTeX](Tutorial_1_LV_Vol_Estimation/Tutorial_1_Exercise_Solutions.tex) | [PDF](Tutorial_1_LV_Vol_Estimation/Tutorial_1_Exercise_Solutions.pdf) |
-| 2. MV Effects and Reference Voltage | [Notebook](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_MV_Effects_Reference_Voltage.ipynb) | [ZIP](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_Colab_Data.zip) | [Requirements](Tutorial_2_MV_Effects_Reference_Voltage/requirements_keras.txt) | [LaTeX](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_Exercise_Solutions.tex) | [PDF](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_Exercise_Solutions.pdf) |
+| 1. LV Voltage Estimation | [Notebook](Tutorial_1_LV_Vol_Estimation/Tutorial_1_LV_Voltage_Estimation.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Team-Nando-Capstone/Capstone_project_2026_sem1/blob/main/Tutorial_1_LV_Vol_Estimation/Tutorial_1_LV_Voltage_Estimation.ipynb) | [Requirements](Tutorial_1_LV_Vol_Estimation/requirements_keras.txt) | [LaTeX](Tutorial_1_LV_Vol_Estimation/Tutorial_1_Exercise_Solutions.tex) | [PDF](Tutorial_1_LV_Vol_Estimation/Tutorial_1_Exercise_Solutions.pdf) |
+| 2. MV Effects and Reference Voltage | [Notebook](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_MV_Effects_Reference_Voltage.ipynb) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Team-Nando-Capstone/Capstone_project_2026_sem1/blob/main/Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_MV_Effects_Reference_Voltage.ipynb) | [Requirements](Tutorial_2_MV_Effects_Reference_Voltage/requirements_keras.txt) | [LaTeX](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_Exercise_Solutions.tex) | [PDF](Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_Exercise_Solutions.pdf) |
 
 See the [Tutorial 1 guide](Tutorial_1_LV_Vol_Estimation/README.md) and [Tutorial 2 guide](Tutorial_2_MV_Effects_Reference_Voltage/README.md) for data paths, training budgets and exercise instructions.
 
@@ -24,11 +24,11 @@ Run Sections 2.2-2.6 in order with `RUN_MODE = "quick"`. Both notebooks support 
 
 ## Run in Colab
 
-Tutorial 1 Colab:[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1HtoyBFzUATTBMBOEqwazzHkHN03kKRhL?usp=sharing)
+Tutorial 1 Colab: [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Team-Nando-Capstone/Capstone_project_2026_sem1/blob/main/Tutorial_1_LV_Vol_Estimation/Tutorial_1_LV_Voltage_Estimation.ipynb)
 
-Tutorial 2 Colab:[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1FBophjTJ5SIb_lFAx1a6_SkUJT9fc__H?usp=sharing)
+Tutorial 2 Colab: [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Team-Nando-Capstone/Capstone_project_2026_sem1/blob/main/Tutorial_2_MV_Effects_Reference_Voltage/Tutorial_2_MV_Effects_Reference_Voltage.ipynb)
 
-Upload the chosen notebook, run its runtime-preparation cell, and upload the matching Colab data ZIP when prompted. A whole-project upload is not needed. Download generated results before ending the runtime; saving a notebook does not preserve separate runtime files. Only load trusted ZIP and pickle files.
+Open a tutorial with its Colab badge, then run **Prepare the runtime**. In Colab, the notebook clones this GitHub repository into the temporary runtime and reads the checked-in data files directly, so no notebook or ZIP upload is needed. Everyone can edit and run their own Colab session; those edits do not change the GitHub original. Opening the badge again starts from the GitHub version. Use **File > Save a copy in Drive** only for a personal copy.
 
 ## Exercise solutions
 

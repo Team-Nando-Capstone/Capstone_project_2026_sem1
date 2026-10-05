@@ -25,16 +25,15 @@ Run Sections 2.2-2.6 in order. Start with `RUN_MODE = "quick"`. The working dire
 
 ## Run in Colab
 
-1. Upload `Tutorial_1_LV_Voltage_Estimation.ipynb` to Google Colab.
+1. Open the GitHub notebook in Colab: [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Team-Nando-Capstone/Capstone_project_2026_sem1/blob/main/Tutorial_1_LV_Vol_Estimation/Tutorial_1_LV_Voltage_Estimation.ipynb)
 2. Run **Prepare the runtime** in Section 2.2.1; restart if requested, then run from that cell again.
-3. Upload `Tutorial_1_Colab_Data.zip` when prompted. Do not rename it.
-4. Continue through Sections 2.2-2.6 in order using quick mode.
+3. Continue through Sections 2.2-2.6 in order using quick mode.
 
-The ZIP contains this tutorial's four simulated-data files and circuit image. No Google Drive mount is required. Download `Tutorial_1/results/tutorial/quick/` (or `full/`) and any `Tutorial_1/results/exercises/` files before the runtime ends. Saving the notebook does not save these files. Only load trusted ZIP and pickle files.
+In Colab, the preparation cell clones this GitHub repository into the temporary runtime and reads this tutorial's checked-in data files directly, so no notebook or ZIP upload is needed. Everyone can edit and run their own Colab session without changing the GitHub original; opening the badge again starts from the GitHub version. Download `results/tutorial/quick/` (or `full/`) and any `results/exercises/` files before the runtime ends. Saving a notebook does not preserve separate runtime files.
 
 ## Data and paths
 
-Locally, the notebook loads `PQ.pkl` and `V.pkl` from the `training/` and `test/` folders inside `synthentic_data_5_min_LV`. In Colab, the matching folders are under `data/`. Preserve the supplied folder spelling. The input columns are P/Q for 31 customers; the targets are their 31 voltages.
+The notebook loads `PQ.pkl` and `V.pkl` from the `training/` and `test/` folders inside `synthentic_data_5_min_LV`. Preserve the supplied folder spelling. The input columns are P/Q for 31 customers; the targets are their 31 voltages.
 
 From a different working directory, replace the first assignment in Section 2.2.2 with `TUTORIAL_DIRECTORY = Path("relative/path/to/tutorial")` or an absolute path. The directory is resolved once. In Section 2.3.1, each `DATA_FILES` entry may be relative to that directory or absolute. Do not repeat the tutorial prefix in a relative entry. Missing directories or files raise a clear `FileNotFoundError` before data loading.
 
