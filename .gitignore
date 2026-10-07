@@ -23,7 +23,8 @@ data/
 *.h5
 
 # Local presentation template; it is not part of the tutorial repository.
-PosterPresentations.com-A0-Template-Aragon.pptx
+PosterPresentations.com-A0-Template-Aragon*.pptx
+~$*.pptx
 
 # Historical local copies are not runnable tutorial entry points.
 archive/

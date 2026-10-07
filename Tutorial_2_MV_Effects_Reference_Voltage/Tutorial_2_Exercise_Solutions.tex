@@ -77,7 +77,7 @@ e1_targets = V_mv_tr[:, e1_target_indices].astype(
 e1_model_names = list(e1_model_inputs)
 
 assert e1_reference_columns == [
-    "phase_a", "phase_b", "phase_c"
+    "phase1", "phase2", "phase3"
 ]
 assert e1_model_inputs["PQ_only"].shape == (6048, 62)
 assert e1_model_inputs["PQ_plus_Vref"].shape == (6048, 65)

@@ -12,9 +12,9 @@
   "training_fits": 32,
   "reference_source": "V_secondary.pkl",
   "reference_columns": [
-    "phase_a",
-    "phase_b",
-    "phase_c"
+    "phase1",
+    "phase2",
+    "phase3"
   ],
   "target_customers": [
     1,

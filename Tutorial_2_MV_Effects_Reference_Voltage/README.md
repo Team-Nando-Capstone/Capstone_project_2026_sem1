@@ -35,7 +35,7 @@ In Colab, the preparation cell clones this GitHub repository into the temporary 
 
 `synthentic_data_5_min_mv_secondary/training_tx/` and `test_tx/` each contain `PQ.pkl`, `V.pkl` and `V_secondary.pkl`. Preserve the supplied folder spelling. Keep `network/customer_topology.csv` and the network image in `network/`.
 
-The two input sets contain 62 and 65 columns and share all 31 voltage targets. The extra columns are `phase_a`, `phase_b` and `phase_c` from the supplied secondary-reference file, not the first three customer-voltage columns. Their exact physical extraction node and generation procedure are undocumented. Do not assume a verified reference-to-customer mapping. These signals must be available at prediction time.
+The two input sets contain 62 and 65 columns and share all 31 voltage targets. The extra columns are standardised as `phase1`, `phase2` and `phase3` after loading the supplied secondary-reference file; they are not the first three customer-voltage columns. Their exact physical extraction node and generation procedure are undocumented. Do not assume a verified reference-to-customer mapping. These signals must be available at prediction time.
 
 From a different working directory, replace the first assignment in Section 2.2.2 with `TUTORIAL_DIRECTORY = Path("relative/path/to/tutorial")` or an absolute path. The directory is resolved once. In Section 2.3.1, each `DATA_FILES` entry may be relative to that directory or absolute. Do not repeat the tutorial prefix in a relative entry. Missing directories or files raise a clear `FileNotFoundError` before data loading.
 
