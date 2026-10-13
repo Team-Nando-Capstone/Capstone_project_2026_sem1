@@ -31,6 +31,8 @@ Run Sections 2.2-2.6 in order. Start with `RUN_MODE = "quick"`. The working dire
 
 In Colab, the preparation cell clones this GitHub repository into the temporary runtime and reads this tutorial's checked-in data and network files directly, so no notebook or ZIP upload is needed. Everyone can edit and run their own Colab session without changing the GitHub original; opening the badge again starts from the GitHub version. Download `results/tutorial/quick/` (or `full/`) and any `results/exercises/` files before the runtime ends. Saving a notebook does not preserve separate runtime files.
 
+The Colab data ZIP is an optional copy of the supplied data and network image for manual transfer. The default notebook setup uses the cloned repository and does not require ZIP upload or extraction.
+
 ## Data and paths
 
 `synthentic_data_5_min_mv_secondary/training_tx/` and `test_tx/` each contain `PQ.pkl`, `V.pkl` and `V_secondary.pkl`. Preserve the supplied folder spelling. Keep `network/customer_topology.csv` and the network image in `network/`.

@@ -30,6 +30,8 @@ Tutorial 2 Colab: [![Open in Colab](https://colab.research.google.com/assets/col
 
 Open a tutorial with its Colab badge, then run **Prepare the runtime**. In Colab, the notebook clones this GitHub repository into the temporary runtime and reads the checked-in data files directly, so no notebook or ZIP upload is needed. Everyone can edit and run their own Colab session; those edits do not change the GitHub original. Opening the badge again starts from the GitHub version. Use **File > Save a copy in Drive** only for a personal copy.
 
+The Colab data ZIPs are optional copies of the supplied data and network assets for manual transfer. The default notebook setup uses the cloned repository and does not require ZIP upload or extraction.
+
 ## Exercise solutions
 
 Each tutorial contains two exercise groups with seven coding tasks. The student TODO cells remain empty. In a fresh kernel, run Sections 2.2-2.4, then use the seven listings in the matching Exercise Solutions document. The main tutorial search does not need to be repeated first.

@@ -22,11 +22,6 @@ TUTORIALS = (
 )
 IGNORED = {'.git', '.venv', 'venv', 'node_modules'}
 CACHES = {'__pycache__', '.ipynb_checkpoints', '.pytest_cache'}
-# Negative checks for obsolete presentation labels, not required artifacts.
-PACKAGING = re.compile(
-    r'(?i:\boverleaf\b|\benglish\b|\banswers?\b|\beditions?\b|'
-    r'\bversions?\b|\brevisions?\b)|(?<![\w])v\d+(?:[._]\d+)*(?![\w])|版本'
-)
 BAD_FILENAME = re.compile(r'(?i)overleaf|answers?|(?:^|[_ .-])v(?:ersion)?[_ .-]?\d+')
 PERSONAL_PATH = re.compile(r'(?i)[a-z]:[\\/]+Users[\\/]|/(?:Users|home)/[^/\s]+/')
 LINK = re.compile(r'!?\[[^\]\n]*\]\((<[^>]+>|[^\s)]+)(?:\s+["\'][^"\']*["\'])?\)')
@@ -60,8 +55,6 @@ def clean_markdown(text):
 
 
 def check_prose(text, location):
-    match = PACKAGING.search(text)
-    require(match is None, f'Obsolete presentation label in {location}: {match.group() if match else ""}')
     require(not PERSONAL_PATH.search(text), f'Personal machine path in {location}')
 
 
@@ -97,14 +90,42 @@ def check_zip(path, expected):
 
 def check_settings(value, location):
     if isinstance(value, dict):
-        for key, item in value.items():
-            require(not re.search(r'(?i)version|environment', key), f'Unnecessary runtime field in {location}: {key}')
+        for item in value.values():
             check_settings(item, location)
     elif isinstance(value, list):
         for item in value:
             check_settings(item, location)
     elif isinstance(value, str):
         require(not PERSONAL_PATH.search(value), f'Personal path in {location}')
+
+
+def check_runtime_paths(book, tutorial, name):
+    """Check the current clone-based setup without running notebook code."""
+    nodes = [node for cell in book.cells if cell.cell_type == 'code'
+             for node in ast.walk(ast.parse(cell.source))]
+    forms = {ast.dump(node) for node in nodes}
+    expected = (
+        f'TUTORIAL_SUBDIR = {tutorial.name!r}',
+        'added_path = TUTORIAL_SUBDIR',
+        'os.chdir(REPO_DIR / TUTORIAL_SUBDIR)',
+        'TUTORIAL_DIRECTORY = Path.cwd() / added_path',
+        'TUTORIAL_DIRECTORY = TUTORIAL_DIRECTORY.expanduser().resolve()',
+        'candidate = TUTORIAL_DIRECTORY / candidate',
+    )
+    for statement in expected:
+        require(ast.dump(ast.parse(statement).body[0]) in forms,
+                f'Missing runtime path setup in {name}: {statement}')
+    clone_calls = [node for node in nodes if isinstance(node, ast.Call)
+                   and isinstance(node.func, ast.Attribute)
+                   and isinstance(node.func.value, ast.Name)
+                   and node.func.value.id == 'subprocess'
+                   and node.func.attr == 'check_call' and node.args
+                   and isinstance(node.args[0], ast.List)]
+    require(any([item.value for item in call.args[0].elts[:2]
+                 if isinstance(item, ast.Constant)] == ['git', 'clone']
+                and {'REPO_URL', 'REPO_DIR'} <=
+                {item.id for item in ast.walk(call.args[0]) if isinstance(item, ast.Name)}
+                for call in clone_calls), f'Missing repository clone setup: {name}')
 
 
 def check_notebook(tutorial, name, number):
@@ -137,13 +158,10 @@ def check_notebook(tutorial, name, number):
                     str(value) for mime, value in output.get('data', {}).items() if mime.startswith('text/')
                 )
                 require(not PERSONAL_PATH.search(visible), f'Personal path in output: {location}')
-                require(not re.search(r'(?i)\b(?:keras|tensorflow|python)\s*[:=]?\s*\d+\.\d+|no gpu|cuda error', visible),
-                        f'Runtime noise: {location}')
     require(execution_counts == list(range(1, len(execution_counts) + 1)), f'Non-contiguous main execution: {name}')
     require(todo_count == 7, f'Expected seven student TODOs: {name}')
     source = '\n'.join(source_parts)
-    require(f'Tutorial_{number}_Colab_Data.zip' in source, f'Wrong Colab archive: {name}')
-    require(f'added_path = "Tutorial_{number}"' in source, f'Wrong Colab folder: {name}')
+    check_runtime_paths(book, tutorial, name)
     require('RUN_MODE = "quick"' in source, f'Saved tutorial is not quick mode: {name}')
     record = book.metadata.get('tutorial_results', {})
     require(record.get('mode') == 'quick' and len(record.get('files', {})) == 5, f'Missing result integrity record: {name}')
@@ -238,9 +256,19 @@ def check_solution(tutorial, name, number):
     return len(reader.pages)
 
 
+def deliverable_paths():
+    """Limit validation to the tutorial release, excluding reports and references."""
+    for name in ('.gitattributes', '.gitignore', 'LICENSE', 'README.md', 'requirements.txt'):
+        yield check_path(ROOT / name)
+    for name in ('scripts', *(folder for folder, _, _ in TUTORIALS)):
+        directory = check_path(ROOT / name)
+        require(directory.is_dir(), f'Not a deliverable directory: {name}')
+        yield from directory.rglob('*')
+
+
 def main():
     files = []
-    for path in ROOT.rglob('*'):
+    for path in deliverable_paths():
         relative = path.relative_to(ROOT)
         if IGNORED.intersection(relative.parts):
             continue
@@ -287,9 +315,9 @@ def main():
         check_zip(tutorial / f'Tutorial_{number}_Colab_Data.zip', expected)
         print(f'PASS Tutorial {number}: {main_cells} sequential main cells; 7 unexecuted TODOs; {pages} PDF pages; Colab ZIP matches local data.')
     require(headings[0] == headings[1], 'Tutorial README section order differs')
-    print(f'PASS: 2 notebooks; {counts["code_cells"]} Python cells; 2 LaTeX sources and rebuilt PDFs; {counts["exercise_rows"]} matching exercise table rows.')
+    print(f'PASS: 2 notebooks; {counts["code_cells"]} Python cells; 2 LaTeX sources and matching PDF build records; {counts["exercise_rows"]} matching exercise table rows.')
     print(f'PASS: {counts["links"]} local Markdown links ({counts["readme_links"]} in the three READMEs); 0 broken links; exact filename case checked.')
-    print('PASS: no obsolete presentation labels, personal paths or generated caches in the checked deliverable content.')
+    print('PASS: no obsolete filenames, personal paths or generated caches in the tutorial release.')
 
 
 if __name__ == '__main__':

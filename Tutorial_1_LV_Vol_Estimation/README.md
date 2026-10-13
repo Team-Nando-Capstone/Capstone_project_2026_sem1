@@ -31,6 +31,8 @@ Run Sections 2.2-2.6 in order. Start with `RUN_MODE = "quick"`. The working dire
 
 In Colab, the preparation cell clones this GitHub repository into the temporary runtime and reads this tutorial's checked-in data files directly, so no notebook or ZIP upload is needed. Everyone can edit and run their own Colab session without changing the GitHub original; opening the badge again starts from the GitHub version. Download `results/tutorial/quick/` (or `full/`) and any `results/exercises/` files before the runtime ends. Saving a notebook does not preserve separate runtime files.
 
+The Colab data ZIP is an optional copy of the supplied data for manual transfer. The default notebook setup uses the cloned repository and does not require ZIP upload or extraction.
+
 ## Data and paths
 
 The notebook loads `PQ.pkl` and `V.pkl` from the `training/` and `test/` folders inside `synthentic_data_5_min_LV`. Preserve the supplied folder spelling. The input columns are P/Q for 31 customers; the targets are their 31 voltages.
