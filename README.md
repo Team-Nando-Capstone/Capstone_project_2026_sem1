@@ -38,7 +38,7 @@ Each tutorial contains two exercise groups with seven coding tasks. The student 
 
 The LaTeX files are the sources of the PDFs. Install Tectonic, then run `python scripts/build_solutions.py` from the project root. The [build script](scripts/build_solutions.py) rebuilds both PDFs and updates their source/asset checksums together. If the compiler is not on PATH, pass `--compiler path/to/tectonic`. Keep each tutorial's `assets/` directory in place.
 
-Main tutorial results are in `results/tutorial/quick/`; exercise results are in `results/exercises/`, relative to each tutorial folder. These are different experiments and should not be mixed. The small CSV/JSON result files are included alongside the saved notebook outputs. Generated plot files are ignored; the published Tutorial 1 illustration is in its stable `assets/` directory.
+Main tutorial results are in `results/tutorial/quick/`; exercise results are in `results/exercises/`, relative to each tutorial folder. These are different experiments and should not be mixed. The small CSV/JSON result files are included alongside the saved notebook outputs. Generated plot files are ignored; each published solution illustration is kept at `assets/exercise_voltage_profiles.png` in its tutorial folder.
 
 ## Validation
 

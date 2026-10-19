@@ -3,7 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage[margin=22mm]{geometry}
-\usepackage{amsmath,booktabs,longtable}
+\usepackage{amsmath,booktabs,longtable,graphicx}
 \usepackage{xcolor,listings,textcomp}
 \usepackage[hidelinks]{hyperref}
 \hypersetup{pdftitle={Tutorial 2: MV Effects and Reference Voltage - Exercise Solutions},pdfauthor={},pdfsubject={Exercise Solutions}}
@@ -22,97 +22,83 @@
   columns=fullflexible,keepspaces=true,
   showstringspaces=false,upquote=true,tabsize=4,
   xleftmargin=4pt,xrightmargin=4pt,
-  aboveskip=10pt,belowskip=10pt
+  aboveskip=8pt,belowskip=8pt
 }
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{6pt}
-\title{Tutorial 2: MV Effects and Reference Voltage\\Exercise Solutions}
-\author{}
-\date{}
 
 \begin{document}
-\maketitle
+\begin{center}
+{\Large\bfseries Tutorial 2: MV Effects and Reference Voltage\\
+Exercise Solutions}
+\end{center}
 
-\section*{Before running the solutions}
-Open \path{Tutorial_2_MV_Effects_Reference_Voltage.ipynb} and, in a fresh
-Python kernel, run Sections 2.2--2.4. These sections load the arrays and
-define the model, scaling, validation and search functions used below.
-There is no need to run the tutorial's Sections 2.5--2.6 first.
-Paste the seven Python listings into the matching Exercise Workspace cells
-and run them in order. The listings are complete code, not pseudocode.
+\section*{Before you start}
+In a fresh kernel, run Sections 2.2--2.4 of
+\path{Tutorial_2_MV_Effects_Reference_Voltage.ipynb}.
+Then run the seven listings below in order in the Exercise Workspace.
+Sections 2.5--2.6 are not needed. The listings use the notebook's existing
+data and helpers.
 
-These solutions follow the current notebook's data convention: all 31 columns
-of \path{V.pkl} are targets; the three columns of \path{V_secondary.pkl}
-are additional supplied reference inputs. Thus the two models have 62 and
-65 inputs, respectively, and the same 31 outputs. The precise physical
-extraction node of the secondary-reference file is not documented in the
-supplied data package. No customer column is removed without a verified
-reference-to-customer mapping.
+Each fit uses 40 epochs, independently of quick/full mode. Select settings
+and a seed using three training-data folds; leave the test set until E2.3.
+This is same-time estimation from simulated data, not forecasting.
+The exercises reuse the tutorial's test period, not a new independent test set.
 
-Both exercises use ReLU, 40 epochs, three blocked folds, a learning rate of
-$10^{-3}$, L2 strength $10^{-5}$ and batch size 72. This exercise budget is
-independent of the tutorial's quick/full mode. All selection uses training
-data only. Test data are evaluated only after choosing the configuration
-and seed. This is a classroom reuse of the tutorial's test period, not a
-new independent test set.
+\textbf{How to read this document.} Each task is followed by its recorded
+output and a short explanation. Values come from the existing exercise
+CSV/JSON records and may vary slightly on another run. Selection uses
+unrounded scores, not the rounded values printed here. File-export code
+is omitted so the listings focus on the exercise itself.
 
-\section*{E1.1: Prepare the two input sets and common targets}
-Keep the P/Q columns from all 31 customers in both input sets. Append the
-three supplied reference columns only to the augmented model. Do not fit
-scalers here: validation must fit them separately inside each training fold.
+\section*{E1.1: Prepare two input sets and the same targets}
+Both models use every customer's P/Q. Only the second model also receives
+the three supplied Vref columns. All customer voltages remain targets.
+Do not fit scalers yet; the validation helper handles this within each fold.
 
-\begin{lstlisting}[title={E1.1}]
+\begin{lstlisting}
 e1_reference_columns = REFERENCE_PHASES.copy()
-e1_target_indices = np.arange(C, dtype=int)
-e1_target_customers = e1_target_indices + 1
+e1_target_customers = np.arange(1, C + 1)
 e1_model_inputs = {
-    "PQ_only": PQ_mv_tr.astype(np.float32, copy=False),
+    "PQ_only": PQ_mv_tr,
     "PQ_plus_Vref": np.column_stack([
         PQ_mv_tr, V_secondary_mv_tr
     ]).astype(np.float32),
 }
-e1_targets = V_mv_tr[:, e1_target_indices].astype(
-    np.float32, copy=False
-)
+e1_targets = V_mv_tr
 e1_model_names = list(e1_model_inputs)
 
-assert e1_reference_columns == [
-    "phase1", "phase2", "phase3"
-]
-assert e1_model_inputs["PQ_only"].shape == (6048, 62)
-assert e1_model_inputs["PQ_plus_Vref"].shape == (6048, 65)
-assert e1_targets.shape == (6048, 31)
-assert np.array_equal(
-    e1_model_inputs["PQ_plus_Vref"][:, 62:],
-    V_secondary_mv_tr,
-)
-
-display(pd.DataFrame([
-    {
-        "Model": MODEL_LABELS[name],
-        "Training rows": len(e1_targets),
-        "Inputs": e1_model_inputs[name].shape[1],
-        "Outputs": e1_targets.shape[1],
-    }
-    for name in e1_model_names
-]))
+for name in e1_model_names:
+    print(MODEL_LABELS[name], "inputs:", e1_model_inputs[name].shape)
+print("Targets:", e1_targets.shape)
 print("Reference columns:", e1_reference_columns)
 print("Target customers:", e1_target_customers.tolist())
-
-# Keep exercise results separate from tutorial results.
-e1_results_directory = (
-    TUTORIAL_DIRECTORY / "results" / "exercises"
-)
-e1_results_directory.mkdir(parents=True, exist_ok=True)
 \end{lstlisting}
 
-\section*{E1.2: Compare 93 and 155 hidden neurons}
-Use the existing \texttt{run\_grid\_search()} function. It builds fresh
-models and fits scalers on each fold's training rows only. The two
-configurations require $2\times3\times2=12$ model fits.
+\textbf{Recorded output}
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+Model & Training rows & Inputs & Outputs \\
+\midrule
+P/Q only & 6,048 & 62 & 31 \\
+P/Q + Vref & 6,048 & 65 & 31 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Reference columns: \texttt{phase1}, \texttt{phase2}, \texttt{phase3}.
+Target customers: 1--31.
 
-\begin{lstlisting}[title={E1.2}]
-e1_epochs = 40
+The three extra inputs come from \path{V_secondary.pkl}, not from removing
+three customer targets. No particular physical measurement node is assumed.
+
+\clearpage
+\section*{E1.2: Compare 93 and 155 hidden neurons}
+Use ReLU for both sizes. Keep the learning rate, L2 strength, batch size,
+epochs, folds and seed unchanged. \texttt{run\_grid\_search()} evaluates
+both input designs for each size and stores the scores.
+
+\begin{lstlisting}
 e1_seed = 42
 e1_k = 3
 e1_search_space = {
@@ -121,283 +107,64 @@ e1_search_space = {
     "lr": [1e-3],
     "weight_decay": [1e-5],
     "batch_size": [72],
-    "epochs": [e1_epochs],
+    "epochs": [40],
 }
 e1_results = run_grid_search(
-    e1_model_inputs,
-    e1_targets,
-    e1_search_space,
-    k=e1_k,
-    seed=e1_seed,
+    e1_model_inputs, e1_targets, e1_search_space,
+    k=e1_k, seed=e1_seed
 )
-e1_results.to_csv(
-    e1_results_directory / "exercise_configurations.csv",
-    index=False,
-)
+display(e1_results[[
+    "hidden_neurons", "PQ_only_RMSE_kfold",
+    "PQ_plus_Vref_RMSE_kfold",
+]].round(6))
 \end{lstlisting}
 
-\section*{E1.3: Display validation scores and select a configuration}
-The joint score is the arithmetic mean of the two models' mean validation
-RMSE values. Select one shared configuration using its unrounded score.
-The reported standard deviations describe the three fold scores
-(\texttt{numpy.std}, \texttt{ddof=0}), not confidence intervals.
+\textbf{Recorded output.} Mean validation RMSE, in volts:
+\begin{center}
+\begin{tabular}{rrr}
+\toprule
+Hidden neurons & P/Q only & P/Q + Vref \\
+\midrule
+155 & 0.584702 & 0.054287 \\
+93 & 0.593790 & 0.063779 \\
+\bottomrule
+\end{tabular}
+\end{center}
+The 155-neuron network gives a lower mean error for both inputs in this
+run. E1.3 uses these stored scores; it does not train the networks again.
 
-\begin{lstlisting}[title={E1.3}]
+\clearpage
+\section*{E1.3: Choose one shared configuration}
+The existing exercise rule ranks configurations by the \emph{joint score}:
+the arithmetic mean of the two model-specific mean validation RMSE values.
+This chooses common settings for the comparison, not separate settings
+for each model. The individual scores are still reported separately.
+
+\begin{lstlisting}
 e1_results = e1_results.sort_values(
     "joint_RMSE_kfold", kind="stable"
 ).reset_index(drop=True)
-e1_score_columns = [
-    "hidden_neurons", "activation", "epochs",
-    "PQ_only_RMSE_kfold", "PQ_only_RMSE_std",
-    "PQ_plus_Vref_RMSE_kfold", "PQ_plus_Vref_RMSE_std",
-    "joint_RMSE_kfold",
-]
-display(e1_results[e1_score_columns].round(6))
-
-e1_best_row = e1_results.iloc[0]
-e1_best_config = {
-    "hidden_neurons": int(e1_best_row["hidden_neurons"]),
-    "activation": str(e1_best_row["activation"]),
-    "lr": float(e1_best_row["lr"]),
-    "weight_decay": float(e1_best_row["weight_decay"]),
-    "batch_size": int(e1_best_row["batch_size"]),
-    "epochs": int(e1_best_row["epochs"]),
-}
-assert e1_best_config["activation"] == "relu"
-assert e1_best_config["epochs"] == 40
-print("Selected exercise configuration:", e1_best_config)
-\end{lstlisting}
-
-\section*{E2.1: Compare seeds 0, 1 and 2}
-Keep the configuration and folds fixed. This step uses training-period
-data only and requires $3\times3\times2=18$ additional model fits.
-
-\begin{lstlisting}[title={E2.1}]
-e2_seeds = [0, 1, 2]
-e2_seed_results = run_seed_search(
-    e1_model_inputs,
-    e1_targets,
-    e1_best_config,
-    e2_seeds,
-    k=e1_k,
-)
-e2_seed_results = e2_seed_results.sort_values(
-    "joint_RMSE_kfold", kind="stable"
-).reset_index(drop=True)
-display(e2_seed_results[[
-    "seed",
+display(e1_results[[
+    "hidden_neurons",
     "PQ_only_RMSE_kfold", "PQ_only_RMSE_std",
     "PQ_plus_Vref_RMSE_kfold", "PQ_plus_Vref_RMSE_std",
     "joint_RMSE_kfold",
 ]].round(6))
-e2_selected_seed = int(e2_seed_results.iloc[0]["seed"])
-print("Selected exercise seed:", e2_selected_seed)
-e2_seed_results.to_csv(
-    e1_results_directory / "exercise_seeds.csv",
-    index=False,
-)
-\end{lstlisting}
-
-\section*{E2.2: Fit new scalers and train two new final models}
-Fit one common target scaler and one input scaler per model on all exercise
-training rows. Do not reuse the tutorial's final models or fold models.
-These two fits bring the exercise total to $12+18+2=32$.
-
-\begin{lstlisting}[title={E2.2}]
-e2_output_scaler = MinMaxScaler().fit(e1_targets)
-e2_y_train_scaled = e2_output_scaler.transform(
-    e1_targets
-).astype(np.float32)
-e2_models = {}
-e2_input_scalers = {}
-e2_histories = {}
-e2_training_rows = []
-
-for name in e1_model_names:
-    e2_input_scalers[name] = MinMaxScaler().fit(
-        e1_model_inputs[name]
-    )
-    e2_x_train_scaled = e2_input_scalers[name].transform(
-        e1_model_inputs[name]
-    ).astype(np.float32)
-    e2_models[name] = build_model(
-        e2_x_train_scaled.shape[1],
-        e2_y_train_scaled.shape[1],
-        e1_best_config,
-        seed=e2_selected_seed,
-    )
-    e2_histories[name] = train_model(
-        e2_models[name],
-        e2_x_train_scaled,
-        e2_y_train_scaled,
-        e1_best_config,
-    )
-    e2_completed_epochs = len(e2_histories[name].epoch)
-    assert e2_completed_epochs == e1_best_config["epochs"]
-    e2_training_rows.append({
-        "Model": MODEL_LABELS[name],
-        "Inputs": e2_models[name].input_shape[-1],
-        "Outputs": e2_models[name].output_shape[-1],
-        "Completed epochs": e2_completed_epochs,
-    })
-
-display(pd.DataFrame(e2_training_rows))
-e2_run_settings = {
-    "configuration": e1_best_config,
-    "selected_seed": e2_selected_seed,
-    "folds": e1_k,
-    "training_fits": 32,
-    "reference_source": "V_secondary.pkl",
-    "reference_columns": e1_reference_columns,
-    "target_customers": e1_target_customers.tolist(),
+e1_best_row = e1_results.iloc[0]
+e1_best_config = {
+    "hidden_neurons": int(e1_best_row["hidden_neurons"]),
+    "activation": "relu",
+    "lr": 1e-3,
+    "weight_decay": 1e-5,
+    "batch_size": 72,
+    "epochs": 40,
 }
-with (e1_results_directory / "exercise_settings.json").open(
-    "w", encoding="utf-8"
-) as settings_file:
-    json.dump(e2_run_settings, settings_file, indent=2)
+print("Selected configuration:", e1_best_config)
 \end{lstlisting}
 
-\section*{E2.3: Predict test voltages and report errors}
-Transform test inputs with the fitted training scalers. Never call
-\texttt{fit()} or \texttt{fit\_transform()} on test data.
-The predictions are converted back to volts before calculating errors.
-For $N$ time steps and $C$ targets, the overall metrics are
-\[
-  \mathrm{RMSE}=\sqrt{\frac{1}{NC}\sum_{t=1}^{N}\sum_{c=1}^{C}
-  (\widehat V_{t,c}-V_{t,c})^2},\qquad
-  \mathrm{MAE}=\frac{1}{NC}\sum_{t=1}^{N}\sum_{c=1}^{C}
-  |\widehat V_{t,c}-V_{t,c}|.
-\]
-Per-customer RMSE averages over time only.
-
-\begin{lstlisting}[title={E2.3}]
-e2_test_inputs = {
-    "PQ_only": PQ_mv_te.astype(np.float32, copy=False),
-    "PQ_plus_Vref": np.column_stack([
-        PQ_mv_te, V_secondary_mv_te
-    ]).astype(np.float32),
-}
-e2_test_targets = V_mv_te[:, e1_target_indices].astype(
-    np.float32, copy=False
-)
-assert e2_test_inputs["PQ_only"].shape == (2016, 62)
-assert e2_test_inputs["PQ_plus_Vref"].shape == (2016, 65)
-assert e2_test_targets.shape == (2016, 31)
-
-e2_predictions = {}
-e2_errors = {}
-e2_metric_rows = []
-for name in e1_model_names:
-    e2_x_test_scaled = e2_input_scalers[name].transform(
-        e2_test_inputs[name]
-    ).astype(np.float32)
-    e2_predictions[name] = predict_unscaled(
-        e2_models[name], e2_x_test_scaled, e2_output_scaler
-    )
-    assert e2_predictions[name].shape == e2_test_targets.shape
-    assert np.isfinite(e2_predictions[name]).all()
-    e2_errors[name] = e2_predictions[name] - e2_test_targets
-    e2_metric_rows.append({
-        "Model": MODEL_LABELS[name],
-        "RMSE (V)": float(np.sqrt(np.mean(
-            e2_errors[name] ** 2
-        ))),
-        "MAE (V)": float(np.mean(np.abs(e2_errors[name]))),
-    })
-
-e2_metrics = pd.DataFrame(e2_metric_rows)
-display(e2_metrics.round(6))
-e2_customer_rmse = pd.DataFrame({
-    "Customer": e1_target_customers,
-    "P/Q only RMSE (V)": np.sqrt(np.mean(
-        e2_errors["PQ_only"] ** 2, axis=0
-    )),
-    "P/Q + Vref RMSE (V)": np.sqrt(np.mean(
-        e2_errors["PQ_plus_Vref"] ** 2, axis=0
-    )),
-})
-display(e2_customer_rmse.round(6))
-e2_metrics.to_csv(
-    e1_results_directory / "exercise_test_metrics.csv",
-    index=False,
-)
-e2_customer_rmse.to_csv(
-    e1_results_directory / "exercise_customer_rmse.csv",
-    index=False,
-)
-\end{lstlisting}
-
-\section*{E2.4: Inspect the worst P/Q-only customer}
-Choose the customer using the P/Q-only test RMSE, then use that same
-customer for both model comparisons. This is post-training inspection,
-not a further model-selection step. Residuals are estimate minus reference.
-
-\begin{lstlisting}[title={E2.4}]
-e2_worst_position = int(np.argmax(
-    e2_customer_rmse["P/Q only RMSE (V)"].to_numpy()
-))
-e2_worst_customer = int(
-    e1_target_customers[e2_worst_position]
-)
-print("Worst P/Q-only customer:", e2_worst_customer)
-display(e2_customer_rmse.iloc[[e2_worst_position]].round(6))
-
-e2_test_hours = (
-    np.arange(len(e2_test_targets)) * MINUTES_PER_STEP / 60
-)
-e2_fig, e2_axes = plt.subplots(
-    2, 1, figsize=(11, 6), sharex=True
-)
-e2_axes[0].plot(
-    e2_test_hours,
-    e2_test_targets[:, e2_worst_position],
-    color="black", label="Simulated reference",
-)
-for name, colour in [
-    ("PQ_only", "tab:red"),
-    ("PQ_plus_Vref", "tab:green"),
-]:
-    e2_axes[0].plot(
-        e2_test_hours,
-        e2_predictions[name][:, e2_worst_position],
-        color=colour, label=MODEL_LABELS[name], alpha=0.8,
-    )
-    e2_axes[1].plot(
-        e2_test_hours,
-        e2_errors[name][:, e2_worst_position],
-        color=colour, label=MODEL_LABELS[name], linewidth=0.8,
-    )
-e2_axes[0].set_ylabel("Voltage (V)")
-e2_axes[0].set_title(
-    f"Exercise: worst P/Q-only customer {e2_worst_customer}"
-)
-e2_axes[0].legend()
-e2_axes[1].axhline(0, color="black", linestyle="--")
-e2_axes[1].set_xlabel("Hours from start of test period")
-e2_axes[1].set_ylabel("Estimate - reference (V)")
-e2_axes[1].set_title("Voltage residuals")
-e2_axes[1].legend()
-e2_fig.tight_layout()
-e2_fig.savefig(
-    e1_results_directory / "exercise_worst_customer.png",
-    dpi=160, bbox_inches="tight",
-)
-plt.show()
-\end{lstlisting}
-
-\section*{Verified execution example}
-The following results are from an actual run of the listings above, not
-the tutorial's tanh models. Values may vary slightly across environments.
-The code selects settings from validation scores; the numbers below must
-not be hard-coded as a replacement for that selection.
-
-All 32 exercise fits completed without errors.
-
-\subsection*{E1.2--E1.3: Configuration comparison}
-
-Mean and population standard deviation of fold RMSE, in volts:
-
+\textbf{Recorded output.} Fold means and standard deviations are in volts.
 \begin{center}
+{\small
 \begin{tabular}{rrrrrr}
 \toprule
 Hidden & P/Q mean & P/Q std. & +Vref mean & +Vref std. & Joint \\
@@ -405,13 +172,33 @@ Hidden & P/Q mean & P/Q std. & +Vref mean & +Vref std. & Joint \\
 155 & 0.584702 & 0.002578 & 0.054287 & 0.000410 & 0.319494 \\
 93 & 0.593790 & 0.015297 & 0.063779 & 0.003495 & 0.328785 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{center}
+Select \textbf{155 hidden neurons with ReLU}. Learning rate $10^{-3}$,
+L2 strength $10^{-5}$, batch size 72 and 40 epochs remain unchanged.
+Standard deviations describe differences across the three folds,
+not confidence intervals.
 
-Selected hidden-neuron count: 155.
+\clearpage
+\section*{E2.1: Choose a shared random seed}
+Compare seeds 0, 1 and 2 with the selected configuration and the same folds.
+The returned table is ranked by joint validation score, lowest first.
+Take the seed from the first row.
 
-\subsection*{E2.1: Seed comparison}
+\begin{lstlisting}
+e2_seed_results = run_seed_search(
+    e1_model_inputs, e1_targets, e1_best_config,
+    seeds=[0, 1, 2], k=e1_k
+)
+display(e2_seed_results[[
+    "seed", "PQ_only_RMSE_kfold",
+    "PQ_plus_Vref_RMSE_kfold", "joint_RMSE_kfold",
+]].round(6))
+e2_selected_seed = int(e2_seed_results.iloc[0]["seed"])
+print("Selected seed:", e2_selected_seed)
+\end{lstlisting}
 
+\textbf{Recorded output}
 \begin{center}
 \begin{tabular}{rrrr}
 \toprule
@@ -423,11 +210,49 @@ Seed & P/Q mean RMSE (V) & +Vref mean RMSE (V) & Joint (V) \\
 \bottomrule
 \end{tabular}
 \end{center}
-
 Selected seed: 1.
 
-\subsection*{E2.2: Final training}
+This seed has the lowest joint score here. Both final models use it and
+the selected shared settings. The test set is still unused.
 
+\clearpage
+\section*{E2.2: Train two fresh models on all training rows}
+Fit one target scaler and a separate input scaler for each input design
+using all supplied training rows. Train new models with the selected
+settings and seed; do not continue training validation-fold models.
+
+% Training budget: 2 configurations * 3 folds * 2 models,
+% plus 3 seeds * 3 folds * 2 models, plus 2 final models = 32 fits.
+\begin{lstlisting}
+e2_output_scaler = MinMaxScaler().fit(e1_targets)
+e2_Y_train = e2_output_scaler.transform(e1_targets).astype(np.float32)
+e2_models = {}
+e2_input_scalers = {}
+e2_training_rows = []
+for name in e1_model_names:
+    e2_scaler = MinMaxScaler().fit(e1_model_inputs[name])
+    e2_input_scalers[name] = e2_scaler
+    e2_X_train = e2_scaler.transform(
+        e1_model_inputs[name]
+    ).astype(np.float32)
+    e2_model = build_model(
+        e2_X_train.shape[1], C, e1_best_config,
+        seed=e2_selected_seed
+    )
+    e2_history = train_model(
+        e2_model, e2_X_train, e2_Y_train, e1_best_config
+    )
+    e2_models[name] = e2_model
+    e2_training_rows.append({
+        "Model": MODEL_LABELS[name],
+        "Inputs": e2_model.input_shape[-1],
+        "Outputs": e2_model.output_shape[-1],
+        "Completed epochs": len(e2_history.epoch),
+    })
+display(pd.DataFrame(e2_training_rows))
+\end{lstlisting}
+
+\textbf{Recorded output}
 \begin{center}
 \begin{tabular}{lrrr}
 \toprule
@@ -438,9 +263,57 @@ P/Q + Vref & 65 & 31 & 40 \\
 \bottomrule
 \end{tabular}
 \end{center}
+Both models completed 40 epochs on all 6,048 training rows.
+Their input sizes differ, but their targets and training budget are the same.
+These models, not the fold models, are used for the test predictions.
 
-\subsection*{E2.3: Held-out test metrics}
+\clearpage
+\section*{E2.3: Predict test voltages and calculate errors}
+Use the fitted training scalers to transform the matching test inputs.
+\texttt{predict\_unscaled()} restores volts. Calculate overall RMSE/MAE
+and then one RMSE for each customer, separately for each model.
 
+\begin{lstlisting}
+e2_test_inputs = {
+    "PQ_only": PQ_mv_te,
+    "PQ_plus_Vref": np.column_stack([
+        PQ_mv_te, V_secondary_mv_te
+    ]).astype(np.float32),
+}
+e2_test_targets = V_mv_te
+e2_predictions = {}
+e2_errors = {}
+e2_metric_rows = []
+for name in e1_model_names:
+    e2_X_test = e2_input_scalers[name].transform(
+        e2_test_inputs[name]
+    ).astype(np.float32)
+    e2_predictions[name] = predict_unscaled(
+        e2_models[name], e2_X_test, e2_output_scaler
+    )
+    e2_error = e2_predictions[name] - e2_test_targets
+    e2_errors[name] = e2_error
+    e2_metric_rows.append({
+        "Model": MODEL_LABELS[name],
+        "RMSE (V)": np.sqrt(np.mean(e2_error ** 2)),
+        "MAE (V)": np.mean(np.abs(e2_error)),
+    })
+e2_metrics = pd.DataFrame(e2_metric_rows)
+# axis=0 averages over time, leaving one value per customer.
+e2_customer_rmse = pd.DataFrame({
+    "Customer": e1_target_customers,
+    "P/Q only RMSE (V)": np.sqrt(np.mean(
+        e2_errors["PQ_only"] ** 2, axis=0
+    )),
+    "P/Q + Vref RMSE (V)": np.sqrt(np.mean(
+        e2_errors["PQ_plus_Vref"] ** 2, axis=0
+    )),
+})
+display(e2_metrics.round(6))
+display(e2_customer_rmse.round(6))
+\end{lstlisting}
+
+\textbf{Recorded output.} Evaluation uses 2,016 test rows and all 31 customers.
 \begin{center}
 \begin{tabular}{lrr}
 \toprule
@@ -451,9 +324,17 @@ P/Q + Vref & 0.047638 & 0.034860 \\
 \bottomrule
 \end{tabular}
 \end{center}
+The model with Vref has lower test errors in this experiment. RMSE gives
+more weight to larger errors; MAE is the mean absolute error. Inspect the
+customer table below as well, rather than relying only on overall scores.
+
+\clearpage
+\subsection*{E2.3: Customer-level output}
+These are the per-customer errors from the same test predictions above.
+E2.4 compares both models for the worst P/Q-only customer, customer 5.
 
 \begin{longtable}{rrr}
-\caption{Test RMSE for each of the 31 target customers.}\\
+\caption{E2.3 output: test RMSE for every customer.}\\
 \toprule Customer & P/Q only RMSE (V) & P/Q + Vref RMSE (V) \\ \midrule
 \endfirsthead
 \toprule Customer & P/Q only RMSE (V) & P/Q + Vref RMSE (V) \\ \midrule
@@ -492,15 +373,53 @@ P/Q + Vref & 0.047638 & 0.034860 \\
 31 & 0.580494 & 0.054017 \\
 \end{longtable}
 
-\subsection*{E2.4: Worst P/Q-only customer}
+\clearpage
+\section*{E2.4: Inspect the worst P/Q-only customer}
+Find the customer with the largest P/Q-only RMSE, then plot that same
+customer for both models. This is inspection after training, not another
+selection step. Residuals are estimated voltage minus reference voltage.
 
-Customer 5: P/Q-only RMSE 0.752155 V; P/Q + Vref RMSE 0.032014 V.
+\begin{lstlisting}
+e2_worst = int(np.argmax(e2_customer_rmse["P/Q only RMSE (V)"]))
+e2_customer = int(e1_target_customers[e2_worst])
+print("Worst P/Q-only customer:", e2_customer)
+display(e2_customer_rmse.iloc[[e2_worst]].round(6))
+e2_hours = np.arange(len(e2_test_targets)) * MINUTES_PER_STEP / 60
+e2_fig, e2_axes = plt.subplots(2, 1, figsize=(11, 6), sharex=True)
+e2_axes[0].plot(
+    e2_hours, e2_test_targets[:, e2_worst],
+    color="black", label="Simulated reference"
+)
+for name, colour in [("PQ_only", "tab:red"),
+                     ("PQ_plus_Vref", "tab:green")]:
+    e2_axes[0].plot(
+        e2_hours, e2_predictions[name][:, e2_worst],
+        color=colour, label=MODEL_LABELS[name], alpha=0.8
+    )
+    e2_axes[1].plot(
+        e2_hours, e2_errors[name][:, e2_worst],
+        color=colour, label=MODEL_LABELS[name], linewidth=0.8
+    )
+e2_axes[0].set_ylabel("Voltage (V)")
+e2_axes[0].set_title(f"Exercise: worst P/Q-only customer {e2_customer}")
+e2_axes[0].legend()
+e2_axes[1].axhline(0, color="black", linestyle="--")
+e2_axes[1].set_xlabel("Hours from start of test period")
+e2_axes[1].set_ylabel("Estimate - reference (V)")
+e2_axes[1].set_title("Voltage residuals")
+e2_axes[1].legend()
+e2_fig.tight_layout()
+plt.show()
+\end{lstlisting}
 
-Running E2.4 displays both requested panels and saves the plot here:
+\textbf{Recorded output:} customer 5. RMSE: 0.752155 V (P/Q only),
+0.032014 V (P/Q + Vref).
+
 \begin{center}
-\path{results/exercises/exercise_worst_customer.png}
+\includegraphics[width=0.85\linewidth]{assets/exercise_voltage_profiles.png}
 \end{center}
 
-These are results under the current 31-target, supplied-reference convention. They do not establish the undocumented physical origin of the reference signals.
-
+\textbf{Reading the plot.} Vref reduces the voltage mismatch (top) and
+residuals (bottom) for this customer. Both models are shown for the same
+customer, selected using P/Q-only RMSE.
 \end{document}

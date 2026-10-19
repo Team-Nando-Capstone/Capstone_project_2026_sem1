@@ -63,4 +63,4 @@ From this tutorial folder:
 python ../scripts/build_solutions.py --tutorial 2
 ```
 
-Install Tectonic first, or pass `--compiler path/to/tectonic`. The script builds the PDF and updates `assets/solutions_build.json` together. The source also works with a standard LaTeX installation using its declared packages; use the build script for the checked-in PDF and its integrity record. The PDF includes the complete solutions, code and recorded exercise results. E2.4 generates the comparison plot when its code is run; no external plot file is required to compile this document.
+Install Tectonic first, or pass `--compiler path/to/tectonic`. The script builds the PDF and updates `assets/solutions_build.json` together. The source also works with a standard LaTeX installation using its declared packages; use the build script for the checked-in PDF and its integrity record. The PDF includes the complete solutions, code and recorded exercise results. Keep `assets/exercise_voltage_profiles.png` in place; the published plot does not depend on a generated results directory.

@@ -22,44 +22,38 @@
   columns=fullflexible,keepspaces=true,
   showstringspaces=false,upquote=true,tabsize=4,
   xleftmargin=4pt,xrightmargin=4pt,
-  aboveskip=10pt,belowskip=10pt
+  aboveskip=8pt,belowskip=8pt
 }
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt}
-\title{Tutorial 1: LV Voltage Estimation\\Exercise Solutions}
-\author{}
-\date{}
+\setlength{\parskip}{5pt}
 
 \begin{document}
-\maketitle
+\begin{center}
+{\Large\bfseries Tutorial 1: LV Voltage Estimation\\Exercise Solutions}
+\end{center}
 
-\section*{Before running the solutions}
-These solutions cover all seven tasks in Tutorial 1. In a fresh
-notebook kernel, run Sections 2.2--2.4 of
-\path{Tutorial_1_LV_Voltage_Estimation.ipynb} first. Then paste
-the Python listings into the matching Exercise Workspace cells and run
-them in order. The main tutorial search in Sections 2.5--2.6 does not need
-to be repeated.
+\section*{Before you start}
+In a fresh kernel, run Sections 2.2--2.4 of
+\path{Tutorial_1_LV_Voltage_Estimation.ipynb}. Then run the seven listings
+below in order in the Exercise Workspace. Sections 2.5--2.6 are not needed.
+The listings use the notebook's existing data and helper functions.
 
-The listings reuse the notebook's data and helper functions. The model
-has 62 P/Q inputs and 31 voltage outputs; there are no Vref inputs in
-Tutorial 1. All power and voltage data are simulated. This is same-time
-voltage estimation, not forecasting.
+Each fit uses 40 epochs, independently of quick/full mode. Select settings
+and a seed using three training-data folds; leave the test set until E2.3.
+This is same-time estimation from simulated data, not forecasting. The
+exercises reuse the tutorial's test period, not a new independent test set.
 
-Each exercise fit uses 40 epochs, batch size 72, learning rate $10^{-3}$
-and L2 strength $10^{-5}$. The exercise budget is independent of the
-tutorial's quick/full mode. Scalers must be fitted on training rows only.
-Select the configuration and seed using training-data folds; do not use
-the test set until E2.3. The exercise reuses the tutorial's test period for
-a classroom comparison, not a new independent evaluation.
+\textbf{How to read this document.} Each task is followed by its recorded
+output and a short explanation. Values come from the existing exercise
+CSV/JSON records and may vary slightly on another run. Selection uses
+unrounded scores, not the rounded values printed here. File-export code
+is omitted so the listings focus on the exercise itself.
 
-\section*{E1.1: 93 hidden neurons with tanh}
-Evaluate the starting configuration on three consecutive validation
-blocks. The helper trains a fresh model for each block and returns
-fold errors in volts. Store a copy of the configuration with its scores
-so later changes do not alter this result.
+\section*{E1.1: Start with 93 hidden neurons and tanh}
+Check this configuration on three blocked folds. \texttt{evaluate\_config()}
+fits scalers on each fold's training rows and trains a fresh network.
 
-\begin{lstlisting}[title={E1.1}]
+\begin{lstlisting}
 e1_config = {
     "hidden_neurons": 93,
     "activation": "tanh",
@@ -74,20 +68,26 @@ e1_rows = []
 e1_scores = evaluate_config(
     e1_config, PQ_tr, V_tr, k=e1_k, seed=e1_seed
 )
+# Keep this result for the comparison in E1.3.
 e1_row = e1_config.copy()
 e1_row.update(e1_scores)
 e1_rows.append(e1_row)
-print(
-    f"E1.1: RMSE = {e1_scores['RMSE_kfold']:.6f} V; "
-    f"std = {e1_scores['RMSE_std']:.6f} V"
-)
+print("Mean RMSE (V):", round(e1_scores["RMSE_kfold"], 6))
+print("Std. (V):", round(e1_scores["RMSE_std"], 6))
 \end{lstlisting}
 
-\section*{E1.2: Increase the hidden-neuron count to 155}
-Change only the hidden-neuron count. Keep the activation, other training
-settings, seed and validation folds unchanged.
+\textbf{Recorded output:} mean validation RMSE = 0.081666 V;
+standard deviation = 0.004465 V.
 
-\begin{lstlisting}[title={E1.2}]
+The mean summarises the three validation errors; the standard deviation
+shows how much they differ across folds, not a confidence interval.
+
+\clearpage
+\section*{E1.2: Increase the hidden-neuron count to 155}
+Copy the starting settings and change only the hidden-neuron count. Use
+the same seed and folds for a fair comparison.
+
+\begin{lstlisting}
 e1_config_155 = e1_config.copy()
 e1_config_155["hidden_neurons"] = 155
 e1_scores_155 = evaluate_config(
@@ -96,20 +96,22 @@ e1_scores_155 = evaluate_config(
 e1_row_155 = e1_config_155.copy()
 e1_row_155.update(e1_scores_155)
 e1_rows.append(e1_row_155)
-print(
-    f"E1.2: RMSE = {e1_scores_155['RMSE_kfold']:.6f} V; "
-    f"std = {e1_scores_155['RMSE_std']:.6f} V"
-)
+print("Mean RMSE (V):", round(e1_scores_155["RMSE_kfold"], 6))
+print("Std. (V):", round(e1_scores_155["RMSE_std"], 6))
 \end{lstlisting}
 
-\section*{E1.3: Add the ReLU cases and select a configuration}
-Add the two ReLU cases to the two stored tanh results; do not retrain the
-earlier cases just to display the comparison. Four cases and three folds
-require $4\times3=12$ fits. Select using unrounded mean validation RMSE.
-The standard deviation is the population standard deviation of the three
-fold scores (\texttt{ddof=0}), not a confidence interval.
+\textbf{Recorded output:} mean validation RMSE = 0.075256 V;
+standard deviation = 0.003544 V.
 
-\begin{lstlisting}[title={E1.3}]
+The larger tanh network has a lower validation RMSE in this comparison.
+E1.3 checks whether either ReLU network does better.
+
+\clearpage
+\section*{E1.3: Add ReLU and choose the best configuration}
+Evaluate the two ReLU networks, then combine them with the stored tanh
+results. Sort by mean validation RMSE so the first row is the best case.
+
+\begin{lstlisting}
 for e1_neurons in [93, 155]:
     e1_relu_config = e1_config.copy()
     e1_relu_config["hidden_neurons"] = e1_neurons
@@ -124,199 +126,20 @@ for e1_neurons in [93, 155]:
 e1_results = pd.DataFrame(e1_rows).sort_values(
     "RMSE_kfold", kind="stable"
 ).reset_index(drop=True)
-assert len(e1_results) == 4
 display(e1_results[[
     "hidden_neurons", "activation", "epochs",
     "RMSE_kfold", "RMSE_std",
 ]].round(6))
 
+# Only size and activation changed; keep the other settings.
 e1_best_row = e1_results.iloc[0]
-e1_best_config = {
-    "hidden_neurons": int(e1_best_row["hidden_neurons"]),
-    "activation": str(e1_best_row["activation"]),
-    "lr": float(e1_best_row["lr"]),
-    "weight_decay": float(e1_best_row["weight_decay"]),
-    "batch_size": int(e1_best_row["batch_size"]),
-    "epochs": int(e1_best_row["epochs"]),
-}
+e1_best_config = e1_config.copy()
+e1_best_config["hidden_neurons"] = int(e1_best_row["hidden_neurons"])
+e1_best_config["activation"] = e1_best_row["activation"]
 print("Selected configuration:", e1_best_config)
-
-# Store exercise results separately from the tutorial.
-e1_results_directory = (
-    TUTORIAL_DIRECTORY / "results" / "exercises"
-)
-e1_results_directory.mkdir(parents=True, exist_ok=True)
-e1_results.to_csv(
-    e1_results_directory / "exercise_configurations.csv",
-    index=False,
-)
 \end{lstlisting}
 
-\section*{E2.1: Compare seeds 0, 1 and 2}
-Keep \texttt{e1\_best\_config} unchanged. Use the same three training-data
-folds for each seed. This comparison requires $3\times3=9$ fresh fits.
-
-\begin{lstlisting}[title={E2.1}]
-e2_seeds = [0, 1, 2]
-e2_seed_results = run_seed_search(
-    PQ_tr, V_tr, e1_best_config, e2_seeds, k=e1_k
-)
-e2_seed_results = e2_seed_results.sort_values(
-    "RMSE_kfold", kind="stable"
-).reset_index(drop=True)
-display(e2_seed_results[[
-    "seed", "RMSE_kfold", "RMSE_std"
-]].round(6))
-e2_selected_seed = int(e2_seed_results.iloc[0]["seed"])
-print("Configuration:", e1_best_config)
-print("Selected seed:", e2_selected_seed)
-e2_seed_results.to_csv(
-    e1_results_directory / "exercise_seeds.csv",
-    index=False,
-)
-\end{lstlisting}
-
-\section*{E2.2: Train a new model on all training rows}
-Fit new input and target scalers on all training data. Build a fresh
-model, not a fold model or the tutorial's final model. This last fit
-brings the exercise total to $12+9+1=22$ fits.
-
-\begin{lstlisting}[title={E2.2}]
-e2_input_scaler = MinMaxScaler().fit(PQ_tr)
-e2_output_scaler = MinMaxScaler().fit(V_tr)
-e2_X_train = e2_input_scaler.transform(
-    PQ_tr
-).astype(np.float32)
-e2_Y_train = e2_output_scaler.transform(
-    V_tr
-).astype(np.float32)
-
-e2_model = build_model(
-    2 * C, C, e1_best_config, seed=e2_selected_seed
-)
-e2_history = train_model(
-    e2_model, e2_X_train, e2_Y_train, e1_best_config
-)
-e2_model.summary()
-print("Completed epochs:", len(e2_history.epoch))
-assert len(e2_history.epoch) == 40
-assert e2_model.input_shape[-1] == 62
-assert e2_model.output_shape[-1] == 31
-
-import json
-e2_settings = {
-    "configuration": e1_best_config,
-    "selected_seed": e2_selected_seed,
-    "folds": e1_k,
-    "training_fits": 22,
-    "completed_epochs": len(e2_history.epoch),
-    "network_parameters": int(e2_model.count_params()),
-}
-with (e1_results_directory / "exercise_settings.json").open(
-    "w", encoding="utf-8"
-) as settings_file:
-    json.dump(e2_settings, settings_file, indent=2)
-\end{lstlisting}
-
-\section*{E2.3: Estimate test voltages and calculate errors}
-Use \texttt{transform()}, not \texttt{fit()} or
-\texttt{fit\_transform()}, on test inputs. Convert predictions back to
-volts before evaluating them. For $N$ time steps and $C=31$ customers,
-\[
-\mathrm{RMSE}=\sqrt{\frac{1}{NC}\sum_{t=1}^{N}\sum_{c=1}^{C}
-(\widehat V_{t,c}-V_{t,c})^2},\qquad
-\mathrm{MAE}=\frac{1}{NC}\sum_{t=1}^{N}\sum_{c=1}^{C}
-|\widehat V_{t,c}-V_{t,c}|.
-\]
-For per-customer RMSE, average squared errors over time only.
-
-\begin{lstlisting}[title={E2.3}]
-e2_X_test = e2_input_scaler.transform(
-    PQ_te
-).astype(np.float32)
-e2_V_estimated = predict_unscaled(
-    e2_model, e2_X_test, e2_output_scaler
-)
-assert e2_V_estimated.shape == V_te.shape == (2016, 31)
-assert np.isfinite(e2_V_estimated).all()
-e2_error = e2_V_estimated - V_te
-e2_rmse = float(np.sqrt(np.mean(e2_error ** 2)))
-e2_mae = float(np.mean(np.abs(e2_error)))
-e2_customer_rmse = np.sqrt(np.mean(e2_error ** 2, axis=0))
-
-e2_metrics = pd.DataFrame({
-    "Metric": ["RMSE", "MAE"],
-    "Value (V)": [e2_rmse, e2_mae],
-})
-e2_customer_errors = pd.DataFrame({
-    "Customer": np.arange(1, C + 1),
-    "RMSE (V)": e2_customer_rmse,
-})
-display(e2_metrics.round(6))
-display(e2_customer_errors.round(6))
-e2_metrics.to_csv(
-    e1_results_directory / "exercise_test_metrics.csv",
-    index=False,
-)
-e2_customer_errors.to_csv(
-    e1_results_directory / "exercise_customer_rmse.csv",
-    index=False,
-)
-\end{lstlisting}
-
-\section*{E2.4: Inspect the highest-RMSE customer}
-The array position is zero-based; add one to display the customer number.
-Inspect this customer after evaluation without retuning the model.
-Residuals are estimated voltage minus simulated reference voltage.
-
-\begin{lstlisting}[title={E2.4}]
-e2_worst_customer = int(np.argmax(e2_customer_rmse))
-print(
-    f"Customer {e2_worst_customer + 1}: "
-    f"RMSE = {e2_customer_rmse[e2_worst_customer]:.6f} V"
-)
-e2_hours = np.arange(len(V_te)) * MINUTES_PER_STEP / 60
-e2_fig, e2_axes = plt.subplots(
-    2, 1, figsize=(11, 6), sharex=True
-)
-e2_axes[0].plot(
-    e2_hours, V_te[:, e2_worst_customer],
-    color="black", label="Simulated reference",
-)
-e2_axes[0].plot(
-    e2_hours, e2_V_estimated[:, e2_worst_customer],
-    color="tab:blue", label="Estimated", alpha=0.8,
-)
-e2_axes[0].set_ylabel("Voltage (V)")
-e2_axes[0].set_title(
-    f"Exercise 2: Customer {e2_worst_customer + 1}"
-)
-e2_axes[0].legend()
-e2_axes[1].plot(
-    e2_hours, e2_error[:, e2_worst_customer],
-    color="tab:red", linewidth=0.8,
-)
-e2_axes[1].axhline(0, color="black", linestyle="--")
-e2_axes[1].set_xlabel("Hours from start of test period")
-e2_axes[1].set_ylabel("Estimate - reference (V)")
-e2_axes[1].set_title("Voltage residual")
-e2_fig.tight_layout()
-e2_fig.savefig(
-    e1_results_directory / "exercise_worst_customer.png",
-    dpi=160, bbox_inches="tight",
-)
-plt.show()
-\end{lstlisting}
-
-\section*{Verified execution example}
-These results are from an actual execution of the seven listings above.
-The code selects settings from unrounded validation scores; the recorded
-values are an example, not constants to hard-code into model selection.
-Numerical results may vary slightly across environments.
-
-All 22 exercise fits completed on CPU. The test set contains 2,016 rows and 31 customers.
-
-\subsection*{E1.1--E1.3: Configuration comparison}
+\textbf{Recorded output.} Fold means and standard deviations are in volts.
 
 \begin{center}
 \begin{tabular}{rlrrr}
@@ -331,9 +154,28 @@ Hidden neurons & Activation & Epochs & Mean RMSE (V) & Std. (V) \\
 \end{tabular}
 \end{center}
 
-Selected configuration: 155 hidden neurons, tanh, learning rate $10^{-3}$, L2 strength $10^{-5}$, batch size 72 and 40 epochs.
+Select 155 hidden neurons with \texttt{tanh}. Learning rate $10^{-3}$,
+L2 strength $10^{-5}$, batch size 72 and 40 epochs remain unchanged.
 
-\subsection*{E2.1: Seed comparison}
+\clearpage
+\section*{E2.1: Choose a random seed}
+Compare seeds 0, 1 and 2 with the selected configuration and the same
+folds. The returned table is ranked by mean validation RMSE, lowest
+first. Take the seed from the first row.
+
+\begin{lstlisting}
+e2_seed_results = run_seed_search(
+    PQ_tr, V_tr, e1_best_config, seeds=[0, 1, 2], k=e1_k
+)
+display(e2_seed_results[[
+    "seed", "RMSE_kfold", "RMSE_std"
+]].round(6))
+e2_selected_seed = int(e2_seed_results.iloc[0]["seed"])
+print("Configuration:", e1_best_config)
+print("Selected seed:", e2_selected_seed)
+\end{lstlisting}
+
+\textbf{Recorded output}
 
 \begin{center}
 \begin{tabular}{rrr}
@@ -349,11 +191,86 @@ Seed & Mean validation RMSE (V) & Std. (V) \\
 
 Selected seed: 1.
 
-\subsection*{E2.2: Final network}
+This seed has the lowest mean validation RMSE here. Keep it and the
+selected settings for the final training step; the test set is still unused.
 
-The final model has 62 inputs, 31 outputs and 14,601 network parameters. It completed 40 epochs on all 6,048 training rows. Keras may also show optimizer-state parameters in its summary; these are not additional neurons or trainable network weights.
+\clearpage
+\section*{E2.2: Train a fresh model on all training rows}
+The settings are now fixed. Fit new scalers on all supplied training
+rows, then train a new network. Do not continue training a
+validation-fold model.
 
-\subsection*{E2.3: Held-out test errors}
+\begin{lstlisting}
+e2_input_scaler = MinMaxScaler().fit(PQ_tr)
+e2_output_scaler = MinMaxScaler().fit(V_tr)
+e2_X_train = e2_input_scaler.transform(PQ_tr).astype(np.float32)
+e2_Y_train = e2_output_scaler.transform(V_tr).astype(np.float32)
+
+e2_model = build_model(
+    2 * C, C, e1_best_config, seed=e2_selected_seed
+)
+e2_history = train_model(
+    e2_model, e2_X_train, e2_Y_train, e1_best_config
+)
+e2_model.summary()
+print("Completed epochs:", len(e2_history.epoch))
+\end{lstlisting}
+
+\textbf{Recorded output.} The network part of the summary is:
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Layer & Output width & Network parameters \\
+\midrule
+Hidden Dense (tanh) & 155 & 9,765 \\
+Output Dense (linear) & 31 & 4,836 \\
+\midrule
+\multicolumn{2}{l}{Total trainable network parameters} & 14,601 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The model has 62 inputs and 31 outputs. It completed 40 epochs on all
+6,048 training rows. Keras may additionally list optimizer-state
+parameters; these are not extra trainable network weights.
+
+The fold models helped select settings. This new model is the one used
+to estimate the test voltages.
+
+\clearpage
+\section*{E2.3: Predict test voltages and calculate errors}
+Transform the test inputs with the fitted training scaler.
+\texttt{predict\_unscaled()} converts predictions back to volts before
+the errors are calculated. Do not fit either scaler on the test set.
+
+\begin{lstlisting}
+e2_X_test = e2_input_scaler.transform(PQ_te).astype(np.float32)
+e2_V_estimated = predict_unscaled(
+    e2_model, e2_X_test, e2_output_scaler
+)
+e2_error = e2_V_estimated - V_te
+
+# Overall errors: average over all times and customers.
+e2_rmse = np.sqrt(np.mean(e2_error ** 2))
+e2_mae = np.mean(np.abs(e2_error))
+e2_metrics = pd.DataFrame({
+    "Metric": ["RMSE", "MAE"],
+    "Value (V)": [e2_rmse, e2_mae],
+})
+
+# One RMSE per customer: average over time only (axis=0).
+e2_customer_rmse = np.sqrt(np.mean(e2_error ** 2, axis=0))
+e2_customer_errors = pd.DataFrame({
+    "Customer": np.arange(1, C + 1),
+    "RMSE (V)": e2_customer_rmse,
+})
+display(e2_metrics.round(6))
+display(e2_customer_errors.round(6))
+\end{lstlisting}
+
+\textbf{Recorded output.} Evaluation uses 2,016 test rows and all
+31 customers.
 
 \begin{center}
 \begin{tabular}{lr}
@@ -366,8 +283,17 @@ MAE & 0.039941 \\
 \end{tabular}
 \end{center}
 
+RMSE gives more weight to larger errors; MAE is the mean absolute
+error. The customer table below shows whether the overall score hides
+customers with larger errors.
+
+\clearpage
+\section*{E2.3: Customer-level output}
+These are the per-customer errors from the same test predictions above.
+Customer 18 has the largest RMSE; E2.4 inspects its voltage trace.
+
 \begin{longtable}{rr}
-\caption{Test RMSE for every target customer.}\\
+\caption{E2.3 output: test RMSE for every customer.}\\
 \toprule Customer & RMSE (V) \\ \midrule
 \endfirsthead
 \toprule Customer & RMSE (V) \\ \midrule
@@ -406,15 +332,50 @@ MAE & 0.039941 \\
 31 & 0.062222 \\
 \end{longtable}
 
-\subsection*{E2.4: Highest-RMSE customer}
+\clearpage
+\section*{E2.4: Inspect the customer with the largest RMSE}
+Use \texttt{argmax()} to find the largest customer error. Array positions
+start at zero, so add one for the customer number. Plot its voltage and
+residual (estimate minus reference); do not use this inspection to retune.
 
-Customer 18 has the highest test RMSE: 0.085399 V.
+\begin{lstlisting}
+e2_worst = int(np.argmax(e2_customer_rmse))
+print("Customer:", e2_worst + 1)
+print("RMSE (V):", round(e2_customer_rmse[e2_worst], 6))
+e2_hours = np.arange(len(V_te)) * MINUTES_PER_STEP / 60
+e2_fig, e2_axes = plt.subplots(2, 1, figsize=(11, 6), sharex=True)
+e2_axes[0].plot(
+    e2_hours, V_te[:, e2_worst],
+    color="black", label="Simulated reference"
+)
+e2_axes[0].plot(
+    e2_hours, e2_V_estimated[:, e2_worst],
+    color="tab:blue", label="Estimated", alpha=0.8
+)
+e2_axes[0].set_ylabel("Voltage (V)")
+e2_axes[0].set_title(f"Exercise 2: Customer {e2_worst + 1}")
+e2_axes[0].legend()
+e2_axes[1].plot(
+    e2_hours, e2_error[:, e2_worst],
+    color="tab:red", linewidth=0.8
+)
+e2_axes[1].axhline(0, color="black", linestyle="--")
+e2_axes[1].set_xlabel("Hours from start of test period")
+e2_axes[1].set_ylabel("Estimate - reference (V)")
+e2_axes[1].set_title("Voltage residual")
+e2_fig.tight_layout()
+plt.show()
+\end{lstlisting}
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\linewidth]{assets/exercise_voltage_profiles.png}
-  \caption{Voltage estimates and residuals for the highest-RMSE customer
-  over the full test period, produced by E2.4.}
-\end{figure}
+\textbf{Recorded output:} customer 18; RMSE = 0.085399 V.
+
+\begin{center}
+\includegraphics[width=0.9\linewidth]{assets/exercise_voltage_profiles.png}
+\end{center}
+
+\textbf{Reading the plot.} The top panel compares the two voltage traces.
+The lower panel makes their small differences visible around the
+zero-error line. This customer has the largest RMSE in this run,
+not necessarily in every future dataset.
 
 \end{document}
